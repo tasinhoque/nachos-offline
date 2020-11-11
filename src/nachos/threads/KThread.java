@@ -398,6 +398,7 @@ public class KThread {
     /**
      * Tests whether this module is working.
      */
+    // Todo: Add test for each task here. Use the ThreadTest class.
     public static void selfTest() {
         Lib.debug(dbgThread, "Enter KThread.selfTest");
 
