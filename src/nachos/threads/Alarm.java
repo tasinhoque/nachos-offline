@@ -42,9 +42,8 @@ public class Alarm {
      * (current time) >= (WaitUntil called time)+(x)
      * </blockquote>
      *
-     * @param	x	the minimum number of clock ticks to wait.
-     *
-     * @see	nachos.machine.Timer#getTime()
+     * @param    x    the minimum number of clock ticks to wait.
+     * @see    nachos.machine.Timer#getTime()
      */
     public void waitUntil(long x) {
         // for now, cheat just to get something working (busy waiting is bad)

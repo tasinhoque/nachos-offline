@@ -6,7 +6,9 @@ package nachos.machine;
  * An OS kernel.
  */
 public abstract class Kernel {
-    /** Globally accessible reference to the kernel. */
+    /**
+     * Globally accessible reference to the kernel.
+     */
     public static Kernel kernel = null;
 
     /**

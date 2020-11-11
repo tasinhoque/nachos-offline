@@ -15,11 +15,11 @@ public interface RiderInterface extends Runnable {
      * set. The rider will start receiving events after this method returns,
      * potentially before <tt>run()</tt> is called.
      *
-     * @param	controls	the rider's interface to the elevator bank. The
-     *				rider must not attempt to access the elevator
-     *				bank in <i>any</i> other way.
-     * @param	stops		an array of stops the rider should make; see
-     *				below.
+     * @param    controls    the rider's interface to the elevator bank. The
+     * rider must not attempt to access the elevator
+     * bank in <i>any</i> other way.
+     * @param    stops        an array of stops the rider should make; see
+     * below.
      */
     public void initialize(RiderControls controls, int[] stops);
 
@@ -42,10 +42,16 @@ public interface RiderInterface extends Runnable {
      */
     public void run();
 
-    /** Indicates an elevator intends to move down. */
+    /**
+     * Indicates an elevator intends to move down.
+     */
     public static final int dirDown = -1;
-    /** Indicates an elevator intends not to move. */
+    /**
+     * Indicates an elevator intends not to move.
+     */
     public static final int dirNeither = 0;
-    /** Indicates an elevator intends to move up. */
+    /**
+     * Indicates an elevator intends to move up.
+     */
     public static final int dirUp = 1;
 }

@@ -23,10 +23,10 @@ public interface SerialConsole {
      * <tt>writeByte()</tt> is finished being sent. This means that another
      * byte can be sent.
      *
-     * @param	receiveInterruptHandler	the callback to call when a byte
-     *					arrives.
-     * @param	sendInterruptHandler	the callback to call when another byte
-     *					can be sent.
+     * @param    receiveInterruptHandler    the callback to call when a byte
+     * arrives.
+     * @param    sendInterruptHandler    the callback to call when another byte
+     * can be sent.
      */
     public void setInterruptHandlers(Runnable receiveInterruptHandler,
                                      Runnable sendInterruptHandler);
@@ -35,15 +35,15 @@ public interface SerialConsole {
      * Return the next unsigned byte received (in the range <tt>0</tt> through
      * <tt>255</tt>).
      *
-     * @return	the next byte read, or -1 if no byte is available.
+     * @return the next byte read, or -1 if no byte is available.
      */
-    public int	readByte();
+    public int readByte();
 
     /**
      * Send another byte. If a byte is already being sent, the result is not
      * defined.
      *
-     * @param	value	the byte to be sent (the upper 24 bits are ignored).
+     * @param    value    the byte to be sent (the upper 24 bits are ignored).
      */
     public void writeByte(int value);
 }

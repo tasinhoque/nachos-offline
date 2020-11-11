@@ -53,10 +53,10 @@ public class Condition {
     /**
      * Allocate a new condition variable.
      *
-     * @param	conditionLock	the lock associated with this condition
-     *				variable. The current thread must hold this
-     *				lock whenever it uses <tt>sleep()</tt>,
-     *				<tt>wake()</tt>, or <tt>wakeAll()</tt>.
+     * @param    conditionLock    the lock associated with this condition
+     * variable. The current thread must hold this
+     * lock whenever it uses <tt>sleep()</tt>,
+     * <tt>wake()</tt>, or <tt>wakeAll()</tt>.
      */
     public Condition(Lock conditionLock) {
         this.conditionLock = conditionLock;

@@ -36,7 +36,7 @@ public class VMProcess extends UserProcess {
      * Initializes page tables for this process so that the executable can be
      * demand-paged.
      *
-     * @return	<tt>true</tt> if successful.
+     * @return    <tt>true</tt> if successful.
      */
     protected boolean loadSections() {
         return super.loadSections();
@@ -55,7 +55,7 @@ public class VMProcess extends UserProcess {
      * <i>cause</i> argument identifies which exception occurred; see the
      * <tt>Processor.exceptionZZZ</tt> constants.
      *
-     * @param	cause	the user exception that occurred.
+     * @param    cause    the user exception that occurred.
      */
     public void handleException(int cause) {
         Processor processor = Machine.processor();

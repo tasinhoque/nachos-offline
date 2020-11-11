@@ -9,7 +9,7 @@ public class ArrayFile extends OpenFileWithPosition {
     /**
      * Allocate a new <tt>ArrayFile</tt>.
      *
-     * @param	array	the array backing this file.
+     * @param    array    the array backing this file.
      */
     public ArrayFile(byte[] array) {
         this.array = array;
@@ -24,12 +24,12 @@ public class ArrayFile extends OpenFileWithPosition {
     }
 
     public int read(int position, byte[] buf, int offset, int length) {
-        Lib.assertTrue(offset >= 0 && length >= 0 && offset+length <= buf.length);
+        Lib.assertTrue(offset >= 0 && length >= 0 && offset + length <= buf.length);
 
         if (position < 0 || position >= array.length)
             return 0;
 
-        length = Math.min(length, array.length-position);
+        length = Math.min(length, array.length - position);
         System.arraycopy(array, position, buf, offset, length);
 
         return length;

@@ -15,7 +15,7 @@ public class ThreadedKernel extends Kernel {
 
     /**
      * Initialize this kernel. Creates a scheduler, the first thread, and an
-     * alarm, and enables interrupts. Creates a file system if necessary.   
+     * alarm, and enables interrupts. Creates a file system if necessary.
      */
     public void initialize(String[] args) {
         // set scheduler
@@ -34,7 +34,7 @@ public class ThreadedKernel extends Kernel {
         // start threading
         new KThread(null);
 
-        alarm  = new Alarm();
+        alarm = new Alarm();
 
         Machine.interrupt().enable();
     }
@@ -68,11 +68,17 @@ public class ThreadedKernel extends Kernel {
         Machine.halt();
     }
 
-    /** Globally accessible reference to the scheduler. */
+    /**
+     * Globally accessible reference to the scheduler.
+     */
     public static Scheduler scheduler = null;
-    /** Globally accessible reference to the alarm. */
+    /**
+     * Globally accessible reference to the alarm.
+     */
     public static Alarm alarm = null;
-    /** Globally accessible reference to the file system. */
+    /**
+     * Globally accessible reference to the file system.
+     */
     public static FileSystem fileSystem = null;
 
     // dummy variables to make javac smarter

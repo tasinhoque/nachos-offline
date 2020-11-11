@@ -8,7 +8,7 @@ public class BoatGrader {
      * prints messages to standard out, so that you can watch it.
      * You cannot submit this file, as we will be using our own
      * version of it during grading.
-
+     * <p>
      * Note that this file includes all possible variants of how
      * someone can get from one island to another. Inclusion in
      * this class does not imply that any of the indicated actions

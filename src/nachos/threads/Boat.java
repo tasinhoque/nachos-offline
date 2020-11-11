@@ -1,12 +1,11 @@
 package nachos.threads;
+
 import nachos.ag.BoatGrader;
 
-public class Boat
-{
+public class Boat {
     static BoatGrader bg;
 
-    public static void selfTest()
-    {
+    public static void selfTest() {
         BoatGrader b = new BoatGrader();
 
         System.out.println("\n ***Testing Boats with only 2 children***");
@@ -19,8 +18,7 @@ public class Boat
 //  	begin(3, 3, b);
     }
 
-    public static void begin( int adults, int children, BoatGrader b )
-    {
+    public static void begin(int adults, int children, BoatGrader b) {
         // Store the externally generated autograder in a class
         // variable to be accessible by children.
         bg = b;
@@ -41,8 +39,7 @@ public class Boat
 
     }
 
-    static void AdultItinerary()
-    {
+    static void AdultItinerary() {
 	/* This is where you should put your solutions. Make calls
 	   to the BoatGrader to show that it is synchronized. For
 	   example:
@@ -51,12 +48,10 @@ public class Boat
 	*/
     }
 
-    static void ChildItinerary()
-    {
+    static void ChildItinerary() {
     }
 
-    static void SampleItinerary()
-    {
+    static void SampleItinerary() {
         // Please note that this isn't a valid solution (you can't fit
         // all of them on the boat). Please also note that you may not
         // have a single thread calculate a solution and then just play
