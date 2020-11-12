@@ -2,12 +2,15 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+import java.util.LinkedList;
+
 /**
  * An implementation of condition variables that disables interrupt()s for
  * synchronization.
  *
  * <p>
  * You must implement this.
+ * S
  *
  * @see    nachos.threads.Condition
  */
@@ -20,9 +23,11 @@ public class Condition2 {
      * lock whenever it uses <tt>sleep()</tt>,
      * <tt>wake()</tt>, or <tt>wakeAll()</tt>.
      */
+
     public Condition2(Lock conditionLock) {
         this.conditionLock = conditionLock;
-        waitQueue = ThreadedKernel.scheduler.newThreadQueue(false);
+
+        waitQueue = new LinkedList<KThread>();
     }
 
     /**
@@ -34,14 +39,13 @@ public class Condition2 {
     public void sleep() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
+        boolean status = Machine.interrupt().disable();
+
         conditionLock.release();
-
-        boolean inStatus = Machine.interrupt().disable();
-        waitQueue.waitForAccess(KThread.currentThread());
+        waitQueue.add(KThread.currentThread());
         KThread.sleep();
-        Machine.interrupt().restore(inStatus);
-
         conditionLock.acquire();
+        Machine.interrupt().restore(status);
     }
 
     /**
@@ -51,13 +55,13 @@ public class Condition2 {
     public void wake() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
-        boolean inStatus = Machine.interrupt().disable();
-        KThread thread = waitQueue.nextThread();
+        boolean status = Machine.interrupt().disable();
 
-        if (thread != null)
-            thread.ready();
+        if (!waitQueue.isEmpty()) {
+            (waitQueue.removeFirst()).ready();
+        }
 
-        Machine.interrupt().restore(inStatus);
+        Machine.interrupt().restore(status);
     }
 
     /**
@@ -67,14 +71,12 @@ public class Condition2 {
     public void wakeAll() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
-        boolean inStatus = Machine.interrupt().disable();
-        while (true) {
-            KThread thread = waitQueue.nextThread();
-            if (thread == null)
-                break;
-            thread.ready();
+        boolean status = Machine.interrupt().disable();
+
+        while (!waitQueue.isEmpty()) {
+            wake();
         }
-        Machine.interrupt().restore(inStatus);
+        Machine.interrupt().restore(status);
     }
 
     public static void selfTest() {
@@ -141,5 +143,6 @@ public class Condition2 {
     }
 
     private Lock conditionLock;
-    private ThreadQueue waitQueue;
+    // private LinkedList<Lock> waitQueue;
+    private LinkedList<KThread> waitQueue;
 }

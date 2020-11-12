@@ -99,9 +99,14 @@ public class Alarm {
 
         RunAlarm runAlarm = new RunAlarm();
 
+        KThread[] arrKT = new KThread[10];
+
         for (int i = 0; i < 10; i++) {
-            KThread thread = new KThread(runAlarm).setName("Alarm-" + i);
-            thread.fork();
+            arrKT[i] = new KThread(runAlarm).setName("Alarm-" + i);
+            arrKT[i].fork();
+        }
+        for (int i = 0; i < 10; i++) {
+            arrKT[i].join();
         }
 
         Lib.debug(dbgAlarm, "Exit Alarm.selfTest");
