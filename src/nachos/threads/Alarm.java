@@ -34,7 +34,7 @@ public class Alarm {
         boolean inStatus=Machine.interrupt().disable();
         while(!waitQueue.isEmpty()
                 && waitQueue.peek().wakeTime <= Machine.timer().getTime()) {
-            System.out.println("Waking up thread " +  waitQueue.peek().thread.toString()
+            Lib.debug(dbgAlarm, "Waking up thread " +  waitQueue.peek().thread.toString()
                     + " at " + Machine.timer().getTime() + " cycles");
             waitQueue.poll().thread.ready();
         }
@@ -61,7 +61,7 @@ public class Alarm {
         long wakeTime = Machine.timer().getTime() + x;
 
         boolean inStatus = Machine.interrupt().disable();
-        System.out.println("At " + (wakeTime - x) + " cycles, sleeping thread "
+        Lib.debug(dbgAlarm, "At " + (wakeTime - x) + " cycles, sleeping thread "
                 + KThread.currentThread().toString() + " until " + wakeTime + " cycles");
         waitQueue.add(new WaitThread(KThread.currentThread(), wakeTime));
         KThread.sleep();
