@@ -286,9 +286,12 @@ public class KThread {
 
         boolean intStatus = Machine.interrupt().disable();
 
-        if (joinQueue == null)
-        {
-            joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+        if (joinQueue == null) {
+            /* The transferPriority param of newThreadQueue is ignored
+             * when the scheduler used is RoundRobinScheduler.
+             * We can pass true or false and it won't matter.
+             */
+            joinQueue = ThreadedKernel.scheduler.newThreadQueue(false);
             joinQueue.acquire(this);
         }
 
