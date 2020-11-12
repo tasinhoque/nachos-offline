@@ -3,5 +3,7 @@ out
 doc
 *.iml
 
+*.class
+
 *tags*
 *.vim
