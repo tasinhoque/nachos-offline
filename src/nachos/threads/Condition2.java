@@ -1,6 +1,7 @@
 package nachos.threads;
 
 import nachos.machine.*;
+import java.util.LinkedList;
 
 /**
  * An implementation of condition variables that disables interrupt()s for
@@ -8,21 +9,24 @@ import nachos.machine.*;
  *
  * <p>
  * You must implement this.
- *
- * @see    nachos.threads.Condition
+ *S
+ * @see	nachos.threads.Condition
  */
 public class Condition2 {
     /**
      * Allocate a new condition variable.
      *
-     * @param    conditionLock    the lock associated with this condition
-     * variable. The current thread must hold this
-     * lock whenever it uses <tt>sleep()</tt>,
-     * <tt>wake()</tt>, or <tt>wakeAll()</tt>.
+     * @param	conditionLock	the lock associated with this condition
+     *				variable. The current thread must hold this
+     *				lock whenever it uses <tt>sleep()</tt>,
+     *				<tt>wake()</tt>, or <tt>wakeAll()</tt>.
      */
+
     public Condition2(Lock conditionLock) {
         this.conditionLock = conditionLock;
-        waitQueue = ThreadedKernel.scheduler.newThreadQueue(false);
+
+        // waitQueue = new LinkedList<Lock>();
+        waitQueue = new LinkedList<KThread>();
     }
 
     /**
@@ -34,14 +38,20 @@ public class Condition2 {
     public void sleep() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
+        boolean status = Machine.interrupt().disable();
+
         conditionLock.release();
-
-        boolean inStatus = Machine.interrupt().disable();
-        waitQueue.waitForAccess(KThread.currentThread());
+        waitQueue.add(KThread.currentThread());
         KThread.sleep();
-        Machine.interrupt().restore(inStatus);
-
         conditionLock.acquire();
+        Machine.interrupt().restore(status);
+
+        //		Lock waiter = new Lock();
+        //		waitQueue.add(waiter);
+        //
+        //		conditionLock.release();
+        //		waiter.acquire();
+        //		conditionLock.acquire();
     }
 
     /**
@@ -51,13 +61,14 @@ public class Condition2 {
     public void wake() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
-        boolean inStatus = Machine.interrupt().disable();
-        KThread thread = waitQueue.nextThread();
+        boolean status = Machine.interrupt().disable();
 
-        if (thread != null)
-            thread.ready();
+        if (!waitQueue.isEmpty()) {
+            // ((Lock)waitQueue.removeFirst()).release();
+            (waitQueue.removeFirst()).ready();
+        }
 
-        Machine.interrupt().restore(inStatus);
+        Machine.interrupt().restore(status);
     }
 
     /**
@@ -67,79 +78,94 @@ public class Condition2 {
     public void wakeAll() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
-        boolean inStatus = Machine.interrupt().disable();
-        while (true) {
-            KThread thread = waitQueue.nextThread();
-            if (thread == null)
-                break;
-            thread.ready();
+        boolean status = Machine.interrupt().disable();
+
+        while (!waitQueue.isEmpty()) {
+            wake();
         }
-        Machine.interrupt().restore(inStatus);
+        Machine.interrupt().restore(status);
     }
 
-    public static void selfTest() {
+    public static void selfTest() { //used for testing wake and wakeall
+        System.out.println("--------------Testing Condition 2 ------------------");
+
+        //Variables for testing functions
         final Lock lock = new Lock();
-        final Condition2 condition = new Condition2(lock);
-        int count = 0;
+        final Condition2 con2 = new Condition2(lock);
 
-        class RunCondition2 implements Runnable {
-            int id = -1;
-
-            RunCondition2(int count) {
-                id = count++;
-            }
-
-            @Override
+        KThread sleep = new KThread(new Runnable() {
+            //Test 1: Sleep
             public void run() {
+                //get the Lock
                 lock.acquire();
-                System.out.println("Thread " + id + " is going to sleep");
-                condition.sleep();
-                System.out.println("Thread " + id + " has been woken up");
+
+                System.out.println("TESTING SLEEP");
+                System.out.println("Test 1:\n...Going to sleep.....\n");
+                con2.sleep();
+                System.out.println("Test 1 Complete: Woke up!\n");
                 lock.release();
             }
-        }
 
-        System.out.println("Condition TEST #1: Start");
+        });
 
-        KThread thread1 = new KThread(new RunCondition2(++count));
-        KThread thread2 = new KThread(new RunCondition2(++count));
-        KThread thread3 = new KThread(new RunCondition2(++count));
+        sleep.fork();
 
-        thread1.fork();
-        thread2.fork();
-        thread3.fork();
+        KThread wake = new KThread(new Runnable() {
+            //Test 2: Wake
+            public void run() {
+                lock.acquire();
+                System.out.println("TESTING WAKE");
+                System.out.println("Test 2:\n...Waking a thread...\n");
+                con2.wake();
+                System.out.println("Test 2 Complete: Waking Up!");
+                lock.release();
+            }
+        });
+        wake.fork();
+        sleep.join();
 
-        System.out.println("Main: yielding to run the other thread");
-        KThread.yield();
-        System.out.println("Main: sending the wake signal (to a single thread) then yeilding");
-        lock.acquire();
-        condition.wake();
-        lock.release();
-        KThread.yield();
+        System.out.println("\nTEST 3: SLEEP AND WAKEALL");
+        KThread sleep1 = new KThread(new Runnable() {
+            //Test 3: Wake All sleeping thread 1
+            public void run() {
+                lock.acquire();
+                System.out.println("\n...Sleep1 going to sleep...\n");
+                con2.sleep();
+                System.out.println("Test 3: Sleep1 waking up!");
+                lock.release();
+            }
+        });
+        sleep1.fork();
 
-        System.out.println("Condition TEST #1: End\n");
+        KThread sleep2 = new KThread(new Runnable() {
+            //Test 3: Wake All sleeping thead 2
+            public void run() {
+                lock.acquire();
+                System.out.println("\n...Sleep2 going to sleep...\n");
+                con2.sleep();
+                System.out.println("Test 3: Sleep2 waking up!");
 
-        System.out.println("Condition TEST #2: Start");
+                System.out.println("Test 3 Complete: Everyone is awake!");
+                lock.release();
+            }
+        });
+        sleep2.fork();
 
-        thread1 = new KThread(new RunCondition2(++count));
-        thread2 = new KThread(new RunCondition2(++count));
-        thread3 = new KThread(new RunCondition2(++count));
+        KThread wakeall = new KThread(new Runnable() {
+            //Test 3: Wake all
+            public void run() {
+                lock.acquire();
+                System.out.println("TESTING WAKEALL");
+                System.out.println("\n...Waking all sleeping threads...\n");
+                con2.wakeAll();
+                lock.release();
+            }
+        });
+        wakeall.fork();
 
-        thread1.fork();
-        thread2.fork();
-        thread3.fork();
-
-        System.out.println("Main: yielding to run the other thread");
-        KThread.yield();
-        System.out.println("Main: sending the wake signal (to all threads) then yeilding");
-        lock.acquire();
-        condition.wakeAll();
-        lock.release();
-        KThread.yield();
-
-        System.out.println("Condition TEST #2: End");
     }
 
     private Lock conditionLock;
-    private ThreadQueue waitQueue;
+    // private LinkedList<Lock> waitQueue;
+    private LinkedList<KThread> waitQueue;
 }
