@@ -189,6 +189,14 @@ public class KThread {
         Lib.assertTrue(toBeDestroyed == null);
         toBeDestroyed = currentThread;
 
+        if (currentThread.joinQueue != null) {
+            KThread thread = currentThread.joinQueue.nextThread();
+            while (thread != null) {
+                thread.ready();
+                thread = currentThread.joinQueue.nextThread();
+            }
+        }
+
         currentThread.status = statusFinished;
 
         sleep();
@@ -273,6 +281,21 @@ public class KThread {
         Lib.debug(dbgThread, "Joining to thread: " + toString());
 
         Lib.assertTrue(this != currentThread);
+
+        if (status == statusFinished) return;
+
+        boolean intStatus = Machine.interrupt().disable();
+
+        if (joinQueue == null)
+        {
+            joinQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+            joinQueue.acquire(this);
+        }
+
+        joinQueue.waitForAccess(currentThread);
+        sleep();
+
+        Machine.interrupt().restore(intStatus);
 
     }
 
@@ -386,9 +409,10 @@ public class KThread {
         }
 
         public void run() {
-            for (int i = 0; i < 5; i++) {
+            int z = which == 1 || which == 0 ? 100 : 10;
+            for (int i = 0; i < z; i++) {
                 System.out.println("*** thread " + which + " looped " + i + " times");
-                currentThread.yield();
+                KThread.yield();
             }
         }
 
@@ -402,8 +426,14 @@ public class KThread {
     public static void selfTest() {
         Lib.debug(dbgThread, "Enter KThread.selfTest");
 
-        new KThread(new PingTest(1)).setName("forked thread").fork();
-        new PingTest(0).run();
+        KThread thread1 = new KThread(new PingTest(1)).setName("forked thread");
+        thread1.fork();
+        KThread thread2 = new KThread(new PingTest(2)).setName("forked thread");
+        thread2.fork();
+        thread1.join();
+//        new PingTest(0).run();
+
+        Lib.debug(dbgThread, "Enter KThread.selfTest");
     }
 
     private static final char dbgThread = 't';
@@ -432,7 +462,7 @@ public class KThread {
     private TCB tcb;
 
     /**
-     * Unique identifer for this thread. Used to deterministically compare
+     * Unique identifier for this thread. Used to deterministically compare
      * threads.
      */
     private int id = numCreated++;
@@ -445,4 +475,5 @@ public class KThread {
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
     private static KThread idleThread = null;
+    private ThreadQueue joinQueue = null;
 }
