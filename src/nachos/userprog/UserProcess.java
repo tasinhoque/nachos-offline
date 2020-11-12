@@ -2,7 +2,6 @@ package nachos.userprog;
 
 import nachos.machine.*;
 import nachos.threads.*;
-import nachos.userprog.*;
 
 import java.io.EOFException;
 
@@ -27,6 +26,14 @@ public class UserProcess {
         pageTable = new TranslationEntry[numPhysPages];
         for (int i = 0; i < numPhysPages; i++)
             pageTable[i] = new TranslationEntry(i, i, true, false, false, false);
+
+        fileDescriptors = new OpenFile[16];
+
+        stdin = UserKernel.console.openForReading();
+        stdout = UserKernel.console.openForWriting();
+        fileDescriptors[0] = stdin;
+        fileDescriptors[1] = stdout;
+
     }
 
     /**
@@ -345,6 +352,72 @@ public class UserProcess {
         return 0;
     }
 
+    private int handleRead(int fileDescriptor, int vaddr, int size) {
+        if (fileDescriptor < 0 || fileDescriptor > MAX_FILES) {
+            Lib.debug(dbgProcess, "handleRead: File descriptor out of range.");
+            return -1;
+        }
+        if (size < 0) {
+            Lib.debug(dbgProcess, "handleRead: Size to read cannot be negative.");
+            return -1;
+        }
+
+        OpenFile file;
+        if (fileDescriptors[fileDescriptor] == null) {
+            Lib.debug(dbgProcess, "handleRead: File doesn't exist in the descriptor table.");
+            return -1;
+        } else {
+            file = fileDescriptors[fileDescriptor];
+        }
+
+        int length = 0;
+        byte[] reader = new byte[size];
+        length = file.read(reader, 0, size);
+
+        if (length == -1) {
+            Lib.debug(dbgProcess, "handleRead: Error occurred when tried to read file.");
+            return -1;
+        }
+
+        int byteTransferred = 0;
+        byteTransferred = writeVirtualMemory(vaddr, reader, 0, length);
+
+        return byteTransferred;
+    }
+
+    private int handleWrite(int fileDescriptor, int vaddr, int size) {
+        if (fileDescriptor < 0 || fileDescriptor > MAX_FILES) {
+            Lib.debug(dbgProcess, "handleWrite: File descriptor out of range.");
+            return -1;
+        }
+
+        if (size < 0) {
+            Lib.debug(dbgProcess, "handleWrite: Size to write cannot be negative.");
+            return -1;
+        }
+
+        OpenFile file;
+        if (fileDescriptors[fileDescriptor] == null) {
+            Lib.debug(dbgProcess, "handleWrite: File doesn't exist in the descriptor table.");
+            return -1;
+        } else {
+            file = fileDescriptors[fileDescriptor];
+        }
+
+        int length = 0;
+        byte[] writer = new byte[size];
+        length = readVirtualMemory(vaddr, writer, 0, size);
+
+        int byteTransferred = 0;
+        byteTransferred = file.write(writer, 0, length);
+
+        if (byteTransferred == -1) {
+            Lib.debug(dbgProcess, "handleWrite: Error occurred when tried to tried to write file.");
+        }
+
+        return byteTransferred;
+    }
+
 
     private static final int
         syscallHalt = 0,
@@ -390,6 +463,10 @@ public class UserProcess {
         switch (syscall) {
             case syscallHalt:
                 return handleHalt();
+            case syscallRead:
+                return handleRead(a0, a1, a2);
+            case syscallWrite:
+                return handleWrite(a0, a1, a2);
 
 
             default:
@@ -453,4 +530,11 @@ public class UserProcess {
 
     private static final int pageSize = Processor.pageSize;
     private static final char dbgProcess = 'a';
+
+    protected OpenFile[] fileDescriptors;
+    protected OpenFile stdin;
+    protected OpenFile stdout;
+
+    private final int MAX_FILES = 15;
+    private final int MAX_STRLENGTH = 256;
 }
