@@ -14,6 +14,10 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
+        lock = new Lock();
+        listener = new Condition2(lock);
+        speaker = new Condition2(lock);
+        waitingReturn = new Condition2(lock);
     }
 
     /**
@@ -27,6 +31,25 @@ public class Communicator {
      * @param    word    the integer to transfer.
      */
     public void speak(int word) {
+        lock.acquire();
+        while (sendingSpeaker != 0) {
+            waitingSpeaker++;
+            speaker.sleep();
+            waitingSpeaker--;
+        }
+        sendingSpeaker++;
+        data = word;
+        if (receivingListener != 0) {
+            waitingReturn.wake();
+        } else {
+            waitingReturn.sleep();
+        }
+        sendingSpeaker--;
+        if (waitingSpeaker != 0) {
+            speaker.wake();
+        }
+        lock.release();
+        return;
     }
 
     /**
@@ -38,4 +61,14 @@ public class Communicator {
     public int listen() {
         return 0;
     }
+
+    private int waitingSpeaker = 0;
+    private int sendingSpeaker = 0;
+    private int waitingListener = 0;
+    private int receivingListener = 0;
+    private int data;
+    private Lock lock;
+    private Condition2 speaker;
+    private Condition2 listener;
+    private Condition2 waitingReturn;
 }
