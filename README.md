@@ -1,25 +1,23 @@
-Part 2
+# Report Template
 
-- [x] Task 2
-  - [x] `UserKernel`
-  - [x] `UserProcess`
-    - [x] `lookUpPageTable()`
-    - [x] `readVirtualMemory()`
-    - [x] `writeVirtualMemory()`
-    - [x] `loadSections()`
-    - [x] `unloadSections()`
+## Part #num
 
-### Template
+### Task #num: Heading (copy from the assignment pdf)
+
+- Data Structures Used:
+
+  1. `variableRef`: What it is. What it does.
 
 - Steps:
 
-- Changes:
+  - package.class#method():
 
-- Data Structures Used: 
-
-- Additional Comment:
+    1. Pseudocode step 1.
+    2. Pseudocode step 2.
 
 - Testing:
+
+- Additional Comment: (if any)
 
 ## Part 1
 
