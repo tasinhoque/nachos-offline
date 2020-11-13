@@ -29,7 +29,7 @@ public class UserProcess {
             pageTable[i] = new TranslationEntry(i, i, true, false, false, false);
         }
 
-        fileDescriptors = new OpenFile[16];
+        fileDescriptors = new OpenFile[MAX_FILES];
         boolean inStatus = Machine.interrupt().disable();
         counterLock = new Lock();
         counterLock.acquire();
@@ -447,7 +447,7 @@ public class UserProcess {
      */
     protected void unloadSections() {
         releaseResource();
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < MAX_FILES; i++) {
             if (fileDescriptors[i] != null) {
                 fileDescriptors[i].close();
                 fileDescriptors[i] = null;
@@ -495,7 +495,7 @@ public class UserProcess {
     }
 
     private int handleRead(int fileDescriptor, int vaddr, int size) {
-        if (fileDescriptor < 0 || fileDescriptor > MAX_FILES) {
+        if (fileDescriptor < 0 || fileDescriptor >= MAX_FILES) {
             Lib.debug(dbgProcess, "handleRead: File descriptor out of range.");
             return -1;
         }
@@ -528,7 +528,7 @@ public class UserProcess {
     }
 
     private int handleWrite(int fileDescriptor, int vaddr, int size) {
-        if (fileDescriptor < 0 || fileDescriptor > MAX_FILES) {
+        if (fileDescriptor < 0 || fileDescriptor >= MAX_FILES) {
             Lib.debug(dbgProcess, "handleWrite: File descriptor out of range.");
             return -1;
         }
@@ -809,6 +809,6 @@ public class UserProcess {
     protected static int counter = 0;
     protected int PID;
 
-    private final int MAX_FILES = 15;
+    private final int MAX_FILES = 16;
     private final int MAX_STRLENGTH = 256;
 }
