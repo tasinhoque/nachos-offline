@@ -1,10 +1,10 @@
 Part 2
 
-- [ ] Task 2
-  - [ ] `UserKernel`
-  - [ ] `UserProcess`
-    - [ ] `lookUpPageTable()`
-    - [ ] `readVirtualMemory()`
-    - [ ] `writeVirtualMemory()`
-    - [ ] `loadSections()`
-    - [ ] `unloadSections()`
+- [x] Task 2
+  - [x] `UserKernel`
+  - [x] `UserProcess`
+    - [x] `lookUpPageTable()`
+    - [x] `readVirtualMemory()`
+    - [x] `writeVirtualMemory()`
+    - [x] `loadSections()`
+    - [x] `unloadSections()`
