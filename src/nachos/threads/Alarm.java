@@ -55,7 +55,7 @@ public class Alarm {
      * @param x the minimum number of clock ticks to wait.
      * @see nachos.machine.Timer#getTime()
      */
-    // Todo: Part 1, Task 3
+    // Done: Part 1, Task 3
     public void waitUntil(long x) {
         // for now, cheat just to get something working (busy waiting is bad)
         long wakeTime = Machine.timer().getTime() + x;
