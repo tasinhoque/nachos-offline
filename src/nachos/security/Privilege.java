@@ -53,14 +53,14 @@ public abstract class Privilege {
     /**
      * Perform the specified action with privilege.
      *
-     * @param    action    the action to perform.
+     * @param action the action to perform.
      */
     public abstract void doPrivileged(Runnable action);
 
     /**
      * Perform the specified <tt>PrivilegedAction</tt> with privilege.
      *
-     * @param    action    the action to perform.
+     * @param action the action to perform.
      * @return the return value of the action.
      */
     public abstract Object doPrivileged(PrivilegedAction action);
@@ -68,7 +68,7 @@ public abstract class Privilege {
     /**
      * Perform the specified <tt>PrivilegedExceptionAction</tt> with privilege.
      *
-     * @param    action    the action to perform.
+     * @param action the action to perform.
      * @return the return value of the action.
      */
     public abstract Object doPrivileged(PrivilegedExceptionAction action)
@@ -77,7 +77,7 @@ public abstract class Privilege {
     /**
      * Exit Nachos with the specified status.
      *
-     * @param    exitStatus    the exit status of the Nachos process.
+     * @param exitStatus the exit status of the Nachos process.
      */
     public abstract void exit(int exitStatus);
 
@@ -85,7 +85,7 @@ public abstract class Privilege {
      * Add an <tt>exit()</tt> notification handler. The handler will be invoked
      * by exit().
      *
-     * @param    handler    the notification handler.
+     * @param handler the notification handler.
      */
     public void addExitNotificationHandler(Runnable handler) {
         exitNotificationHandlers.add(handler);
@@ -138,7 +138,7 @@ public abstract class Privilege {
         /**
          * Install a hardware console.
          *
-         * @param    console    the new hardware console.
+         * @param console the new hardware console.
          */
         public void setConsole(SerialConsole console);
     }
@@ -151,11 +151,11 @@ public abstract class Privilege {
         /**
          * Schedule an interrupt to occur at some time in the future.
          *
-         * @param    when    the number of ticks until the interrupt should
-         * occur.
-         * @param    type    a name for the type of interrupt being
-         * scheduled.
-         * @param    handler    the interrupt handler to call.
+         * @param when    the number of ticks until the interrupt should
+         *                occur.
+         * @param type    a name for the type of interrupt being
+         *                scheduled.
+         * @param handler the interrupt handler to call.
          */
         public void schedule(long when, String type, Runnable handler);
 
@@ -190,7 +190,7 @@ public abstract class Privilege {
          * <tt>AutoGrader.runningThread()</tt> <i>must</i> call this method
          * before returning.
          *
-         * @param    thread    the current thread.
+         * @param thread the current thread.
          */
         public void associateThread(KThread thread);
 
@@ -198,7 +198,7 @@ public abstract class Privilege {
          * Authorize the TCB associated with the specified thread to be
          * destroyed.
          *
-         * @param    thread    the thread whose TCB is about to be destroyed.
+         * @param thread the thread whose TCB is about to be destroyed.
          */
         public void authorizeDestroy(KThread thread);
     }

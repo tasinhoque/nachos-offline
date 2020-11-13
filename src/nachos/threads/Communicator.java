@@ -1,7 +1,10 @@
 package nachos.threads;
+
 import nachos.machine.*;
+
 import java.util.Queue;
 import java.util.LinkedList;
+
 /**
  * A <i>communicator</i> allows threads to synchronously exchange 32-bit
  * messages. Multiple threads can be waiting to <i>speak</i>,
@@ -19,6 +22,7 @@ public class Communicator {
         this.listen = new Condition2(waiting);
         this.spoke = false;
     }
+
     /**
      * Wait for a thread to listen through this communicator, and then transfer
      * <i>word</i> to the listener.
@@ -27,12 +31,11 @@ public class Communicator {
      * Does not return until this thread is paired up with a listening thread.
      * Exactly one listener should receive <i>word</i>.
      *
-     * @param	word	the integer to transfer.
+     * @param    word    the integer to transfer.
      */
     public void speak(int word) {
         this.waiting.acquire();
-        while (spoke)
-        {
+        while (spoke) {
             this.listen.wakeAll();
             this.speak.sleep();
         }
@@ -43,11 +46,12 @@ public class Communicator {
         this.speak.sleep();
         this.waiting.release();
     }
+
     /**
      * Wait for a thread to speak through this communicator, and then return
      * the <i>word</i> that thread passed to <tt>speak()</tt>.
      *
-     * @return	the integer transferred.
+     * @return the integer transferred.
      */
     public int listen() {
         this.waiting.acquire();
@@ -82,6 +86,7 @@ public class Communicator {
         System.out.println("-----Communicator Test---------");
         new ComTest(0).run();
     }
+
     protected static class ComTest implements Runnable {
         private int comID;
         private static Communicator comm = new Communicator();
@@ -90,6 +95,7 @@ public class Communicator {
         ComTest(int comID) {
             this.comID = comID;
         }
+
         public void run() {
 
             if (comID == 0) {

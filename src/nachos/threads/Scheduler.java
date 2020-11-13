@@ -5,7 +5,7 @@ import nachos.machine.*;
 /**
  * Coordinates a group of thread queues of the same kind.
  *
- * @see    nachos.threads.ThreadQueue
+ * @see nachos.threads.ThreadQueue
  */
 public abstract class Scheduler {
     /**
@@ -45,9 +45,9 @@ public abstract class Scheduler {
      * to the target thread. Therefore, a join queue should be created with
      * this parameter set to <tt>true</tt>.
      *
-     * @param    transferPriority    <tt>true</tt> if the thread that has
-     * access should receive priority from the
-     * threads that are waiting on this queue.
+     * @param transferPriority <tt>true</tt> if the thread that has
+     *                         access should receive priority from the
+     *                         threads that are waiting on this queue.
      * @return a new thread queue.
      */
     public abstract ThreadQueue newThreadQueue(boolean transferPriority);
@@ -56,7 +56,7 @@ public abstract class Scheduler {
      * Get the priority of the specified thread. Must be called with
      * interrupts disabled.
      *
-     * @param    thread    the thread to get the priority of.
+     * @param thread the thread to get the priority of.
      * @return the thread's priority.
      */
     public int getPriority(KThread thread) {
@@ -92,7 +92,7 @@ public abstract class Scheduler {
      * tickets of all other threads waiting for the thread through a lock or a
      * join.
      *
-     * @param    thread    the thread to get the effective priority of.
+     * @param thread the thread to get the effective priority of.
      * @return the thread's effective priority.
      */
     public int getEffectivePriority(KThread thread) {
@@ -114,8 +114,8 @@ public abstract class Scheduler {
      * Set the priority of the specified thread. Must be called with interrupts
      * disabled.
      *
-     * @param    thread    the thread to set the priority of.
-     * @param    priority    the new priority.
+     * @param thread   the thread to set the priority of.
+     * @param priority the new priority.
      */
     public void setPriority(KThread thread, int priority) {
         Lib.assertTrue(Machine.interrupt().disabled());
@@ -125,7 +125,7 @@ public abstract class Scheduler {
      * Set the priority of the current thread. Equivalent to
      * <tt>setPriority(KThread.currentThread(), priority)</tt>.
      *
-     * @param    priority    the new priority.
+     * @param priority the new priority.
      */
     public void setPriority(int priority) {
         setPriority(KThread.currentThread(), priority);
@@ -135,7 +135,7 @@ public abstract class Scheduler {
      * If possible, raise the priority of the current thread in some
      * scheduler-dependent way.
      *
-     * @return    <tt>true</tt> if the scheduler was able to increase the current
+     * @return <tt>true</tt> if the scheduler was able to increase the current
      * thread's
      * priority.
      */
@@ -148,7 +148,7 @@ public abstract class Scheduler {
      * scheduler-dependent way, preferably by the same amount as would a call
      * to <tt>increasePriority()</tt>.
      *
-     * @return    <tt>true</tt> if the scheduler was able to decrease the current
+     * @return <tt>true</tt> if the scheduler was able to decrease the current
      * thread's priority.
      */
     public boolean decreasePriority() {

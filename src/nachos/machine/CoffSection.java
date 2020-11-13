@@ -14,12 +14,12 @@ public class CoffSection {
     /**
      * Allocate a new COFF section with the specified parameters.
      *
-     * @param    coff        the COFF object to which this section belongs.
-     * @param    name        the COFF name of this section.
-     * @param    executable    <tt>true</tt> if this section contains code.
-     * @param    readOnly    <tt>true</tt> if this section is read-only.
-     * @param    numPages    the number of virtual pages in this section.
-     * @param    firstVPN    the first virtual page number used by this.
+     * @param coff       the COFF object to which this section belongs.
+     * @param name       the COFF name of this section.
+     * @param executable <tt>true</tt> if this section contains code.
+     * @param readOnly   <tt>true</tt> if this section is read-only.
+     * @param numPages   the number of virtual pages in this section.
+     * @param firstVPN   the first virtual page number used by this.
      */
     protected CoffSection(Coff coff, String name, boolean executable,
                           boolean readOnly, int numPages, int firstVPN) {
@@ -39,10 +39,10 @@ public class CoffSection {
     /**
      * Load a COFF section from an executable.
      *
-     * @param    file        the file containing the executable.
-     * @param    headerOffset    the offset of the section header in the
-     * executable.
-     * @exception EOFException    if an error occurs.
+     * @param file         the file containing the executable.
+     * @param headerOffset the offset of the section header in the
+     *                     executable.
+     * @throws EOFException if an error occurs.
      */
     public CoffSection(OpenFile file, Coff coff,
                        int headerOffset) throws EOFException {
@@ -130,7 +130,7 @@ public class CoffSection {
     /**
      * Test whether this section is read-only.
      *
-     * @return    <tt>true</tt> if this section should never be written.
+     * @return <tt>true</tt> if this section should never be written.
      */
     public boolean isReadOnly() {
         return readOnly;
@@ -141,7 +141,7 @@ public class CoffSection {
      * initialized section requires a disk access, while loading a page from an
      * uninitialized section requires only zero-filling the page.
      *
-     * @return    <tt>true</tt> if this section contains initialized data in the
+     * @return <tt>true</tt> if this section contains initialized data in the
      * executable.
      */
     public boolean isInitialzed() {
@@ -169,8 +169,8 @@ public class CoffSection {
     /**
      * Load a page from this segment into physical memory.
      *
-     * @param    spn    the page number within this segment.
-     * @param    ppn    the physical page to load into.
+     * @param spn the page number within this segment.
+     * @param ppn the physical page to load into.
      */
     public void loadPage(int spn, int ppn) {
         Lib.assertTrue(file != null);

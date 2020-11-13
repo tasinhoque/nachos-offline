@@ -34,8 +34,8 @@ public class Coff {
      * instantaneously while handling page faults).
      * </ol>
      *
-     * @param    file    the file containing the executable.
-     * @exception EOFException    if the executable is corrupt.
+     * @param file the file containing the executable.
+     * @throws EOFException if the executable is corrupt.
      */
     public Coff(OpenFile file) throws EOFException {
         this.file = file;
@@ -104,7 +104,7 @@ public class Coff {
      * section numbers include <tt>0</tt> through <tt>getNumSections() -
      * 1</tt>.
      *
-     * @param    sectionNumber    the section to select.
+     * @param sectionNumber the section to select.
      * @return an object that can be used to access the specified section.
      */
     public CoffSection getSection(int sectionNumber) {

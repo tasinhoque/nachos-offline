@@ -23,10 +23,10 @@ public final class Processor {
     /**
      * Allocate a new MIPS processor, with the specified amount of memory.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
-     * @param    numPhysPages    the number of pages of physical memory to
-     * attach.
+     * @param privilege    encapsulates privileged access to the Nachos
+     *                     machine.
+     * @param numPhysPages the number of pages of physical memory to
+     *                     attach.
      */
     public Processor(Privilege privilege, int numPhysPages) {
         System.out.print(" processor");
@@ -64,7 +64,7 @@ public final class Processor {
      * the CPU cause register will specify the cause of the exception (see the
      * <tt>exception<i>*</i></tt> constants).
      *
-     * @param    exceptionHandler    the kernel exception handler.
+     * @param exceptionHandler the kernel exception handler.
      */
     public void setExceptionHandler(Runnable exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
@@ -106,7 +106,7 @@ public final class Processor {
     /**
      * Read and return the contents of the specified CPU register.
      *
-     * @param    number    the register to read.
+     * @param number the register to read.
      * @return the value of the register.
      */
     public int readRegister(int number) {
@@ -118,8 +118,8 @@ public final class Processor {
     /**
      * Write the specified value into the specified CPU register.
      *
-     * @param    number    the register to write.
-     * @param    value    the value to write.
+     * @param number the register to write.
+     * @param value  the value to write.
      */
     public void writeRegister(int number, int value) {
         Lib.assertTrue(number >= 0 && number < numUserRegisters);
@@ -145,7 +145,7 @@ public final class Processor {
      * Using a method associated with the wrong address translation mechanism
      * will result in an assertion failure.
      *
-     * @return    <tt>true</tt> if this processor has a software-managed TLB.
+     * @return <tt>true</tt> if this processor has a software-managed TLB.
      */
     public boolean hasTLB() {
         return usingTLB;
@@ -167,7 +167,7 @@ public final class Processor {
      * the specified page table. The size of the current address space will be
      * determined from the length of the page table array.
      *
-     * @param    pageTable    the page table to use.
+     * @param pageTable the page table to use.
      */
     public void setPageTable(TranslationEntry[] pageTable) {
         Lib.assertTrue(!usingTLB);
@@ -189,7 +189,7 @@ public final class Processor {
     /**
      * Returns the specified TLB entry.
      *
-     * @param    number    the index into the TLB.
+     * @param number the index into the TLB.
      * @return the contents of the specified TLB entry.
      */
     public TranslationEntry readTLBEntry(int number) {
@@ -206,8 +206,8 @@ public final class Processor {
      * The TLB is fully associative, so the location of an entry within the TLB
      * does not affect anything.
      *
-     * @param    number    the index into the TLB.
-     * @param    entry    the new contents of the TLB entry.
+     * @param number the index into the TLB.
+     * @param entry  the new contents of the TLB entry.
      */
     public void writeTLBEntry(int number, TranslationEntry entry) {
         Lib.assertTrue(usingTLB);
@@ -239,11 +239,11 @@ public final class Processor {
     /**
      * Concatenate a page number and an offset into an address.
      *
-     * @param    page    the page number. Must be between <tt>0</tt> and
-     * <tt>(2<sup>32</sup> / pageSize) - 1</tt>.
-     * @param    offset    the offset within the page. Must be between <tt>0</tt>
-     * and
-     * <tt>pageSize - 1</tt>.
+     * @param page   the page number. Must be between <tt>0</tt> and
+     *               <tt>(2<sup>32</sup> / pageSize) - 1</tt>.
+     * @param offset the offset within the page. Must be between <tt>0</tt>
+     *               and
+     *               <tt>pageSize - 1</tt>.
      * @return a 32-bit address consisting of the specified page and offset.
      */
     public static int makeAddress(int page, int offset) {
@@ -256,7 +256,7 @@ public final class Processor {
     /**
      * Extract the page number component from a 32-bit address.
      *
-     * @param    address    the 32-bit address.
+     * @param address the 32-bit address.
      * @return the page number component of the address.
      */
     public static int pageFromAddress(int address) {
@@ -266,7 +266,7 @@ public final class Processor {
     /**
      * Extract the offset component from an address.
      *
-     * @param    address    the 32-bit address.
+     * @param address the 32-bit address.
      * @return the offset component of the address.
      */
     public static int offsetFromAddress(int address) {
@@ -284,11 +284,11 @@ public final class Processor {
      * resulting physical page is valid, and then return the resulting physical
      * address.
      *
-     * @param    vaddr    the virtual address to translate.
-     * @param    size    the size of the memory reference (must be 1, 2, or 4).
-     * @param    writing    <tt>true</tt> if the memory reference is a write.
+     * @param vaddr   the virtual address to translate.
+     * @param size    the size of the memory reference (must be 1, 2, or 4).
+     * @param writing <tt>true</tt> if the memory reference is a write.
      * @return the physical address.
-     * @exception MipsException    if a translation error occurred.
+     * @throws MipsException if a translation error occurred.
      */
     private int translate(int vaddr, int size, boolean writing)
         throws MipsException {
@@ -364,10 +364,10 @@ public final class Processor {
      * Read </i>size</i> (1, 2, or 4) bytes of virtual memory at <i>vaddr</i>,
      * and return the result.
      *
-     * @param    vaddr    the virtual address to read from.
-     * @param    size    the number of bytes to read (1, 2, or 4).
+     * @param vaddr the virtual address to read from.
+     * @param size  the number of bytes to read (1, 2, or 4).
      * @return the value read.
-     * @exception MipsException    if a translation error occurred.
+     * @throws MipsException if a translation error occurred.
      */
     private int readMem(int vaddr, int size) throws MipsException {
         if (Lib.test(dbgProcessor))
@@ -390,10 +390,10 @@ public final class Processor {
      * Write <i>value</i> to </i>size</i> (1, 2, or 4) bytes of virtual memory
      * starting at <i>vaddr</i>.
      *
-     * @param    vaddr    the virtual address to write to.
-     * @param    size    the number of bytes to write (1, 2, or 4).
-     * @param    value    the value to store.
-     * @exception MipsException    if a translation error occurred.
+     * @param vaddr the virtual address to write to.
+     * @param size  the number of bytes to write (1, 2, or 4).
+     * @param value the value to store.
+     * @throws MipsException if a translation error occurred.
      */
     private void writeMem(int vaddr, int size, int value)
         throws MipsException {
@@ -411,13 +411,13 @@ public final class Processor {
     /**
      * Complete the in progress delayed load and scheduled a new one.
      *
-     * @param    nextLoadTarget    the target register of the new load.
-     * @param    nextLoadValue    the value to be loaded into the new target.
-     * @param    nextLoadMask    the mask specifying which bits in the new
-     * target are to be overwritten. If a bit in
-     * <tt>nextLoadMask</tt> is 0, then the
-     * corresponding bit of register
-     * <tt>nextLoadTarget</tt> will not be written.
+     * @param nextLoadTarget the target register of the new load.
+     * @param nextLoadValue  the value to be loaded into the new target.
+     * @param nextLoadMask   the mask specifying which bits in the new
+     *                       target are to be overwritten. If a bit in
+     *                       <tt>nextLoadMask</tt> is 0, then the
+     *                       corresponding bit of register
+     *                       <tt>nextLoadTarget</tt> will not be written.
      */
     private void delayedLoad(int nextLoadTarget, int nextLoadValue,
                              int nextLoadMask) {
@@ -454,7 +454,7 @@ public final class Processor {
      * Transfer the contents of the nextPC register into the PC register, and
      * then write the nextPC register.
      *
-     * @param    nextPC    the new value of the nextPC register.
+     * @param nextPC the new value of the nextPC register.
      */
     private void advancePC(int nextPC) {
         registers[regPC] = registers[regNextPC];

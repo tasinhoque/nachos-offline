@@ -36,9 +36,9 @@ public class LotteryScheduler extends PriorityScheduler {
     /**
      * Allocate a new lottery thread queue.
      *
-     * @param    transferPriority    <tt>true</tt> if this queue should
-     * transfer tickets from waiting threads
-     * to the owning thread.
+     * @param transferPriority <tt>true</tt> if this queue should
+     *                         transfer tickets from waiting threads
+     *                         to the owning thread.
      * @return a new lottery thread queue.
      */
     public ThreadQueue newThreadQueue(boolean transferPriority) {

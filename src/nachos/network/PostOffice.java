@@ -55,7 +55,7 @@ public class PostOffice {
     /**
      * Retrieve a message on the specified port, waiting if necessary.
      *
-     * @param    port    the port on which to wait for a message.
+     * @param port the port on which to wait for a message.
      * @return the message received.
      */
     public MailMessage receive(int port) {

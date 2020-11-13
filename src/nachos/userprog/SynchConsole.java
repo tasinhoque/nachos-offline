@@ -12,7 +12,7 @@ public class SynchConsole {
     /**
      * Allocate a new <tt>SynchConsole</tt>.
      *
-     * @param    console    the underlying serial console to use.
+     * @param console the underlying serial console to use.
      */
     public SynchConsole(SerialConsole console) {
         this.console = console;
@@ -35,8 +35,8 @@ public class SynchConsole {
      * <tt>255</tt>). If a byte has not arrived at, blocks until a byte
      * arrives, or returns immediately, depending on the value of <i>block</i>.
      *
-     * @param    block    <tt>true</tt> if <tt>readByte()</tt> should wait for a
-     * byte if none is available.
+     * @param block <tt>true</tt> if <tt>readByte()</tt> should wait for a
+     *              byte if none is available.
      * @return the next byte read, or -1 if <tt>block</tt> was <tt>false</tt>
      * and no byte was available.
      */
@@ -77,7 +77,7 @@ public class SynchConsole {
     /**
      * Send a byte. Blocks until the send is complete.
      *
-     * @param    value    the byte to be sent (the upper 24 bits are ignored).
+     * @param value the byte to be sent (the upper 24 bits are ignored).
      */
     public void writeByte(int value) {
         writeLock.acquire();

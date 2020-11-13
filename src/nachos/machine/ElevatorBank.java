@@ -30,8 +30,8 @@ public final class ElevatorBank implements Runnable {
     /**
      * Allocate a new elevator bank.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
+     * @param privilege encapsulates privileged access to the Nachos
+     *                  machine.
      */
     public ElevatorBank(Privilege privilege) {
         System.out.print(" elevators");
@@ -47,9 +47,9 @@ public final class ElevatorBank implements Runnable {
      * also be specified. This elevator must not already be running a
      * simulation.
      *
-     * @param    numElevators    the number of elevators in the bank.
-     * @param    numFloors    the number of floors in the bank.
-     * @param    controller    the elevator controller.
+     * @param numElevators the number of elevators in the bank.
+     * @param numFloors    the number of floors in the bank.
+     * @param controller   the elevator controller.
      */
     public void init(int numElevators, int numFloors,
                      ElevatorControllerInterface controller) {
@@ -75,10 +75,10 @@ public final class ElevatorBank implements Runnable {
      * Add a rider to the simulation. This method must not be called after
      * <tt>run()</tt> is called.
      *
-     * @param    rider    the rider to add.
-     * @param    floor    the floor the rider will start on.
-     * @param    stops    the array to pass to the rider's <tt>initialize()</tt>
-     * method.
+     * @param rider the rider to add.
+     * @param floor the floor the rider will start on.
+     * @param stops the array to pass to the rider's <tt>initialize()</tt>
+     *              method.
      * @return the controls that will be given to the rider.
      */
     public RiderControls addRider(RiderInterface rider,

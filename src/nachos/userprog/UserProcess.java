@@ -412,7 +412,7 @@ public class UserProcess {
             entryOffset += 4;
             Lib.assertTrue(writeVirtualMemory(stringOffset, argv[i]) == argv[i].length);
             stringOffset += argv[i].length;
-            Lib.assertTrue(writeVirtualMemory(stringOffset, new byte[] { 0 }) == 1);
+            Lib.assertTrue(writeVirtualMemory(stringOffset, new byte[]{0}) == 1);
             stringOffset += 1;
         }
 
@@ -438,7 +438,7 @@ public class UserProcess {
             CoffSection section = coff.getSection(s);
 
             Lib.debug(dbgProcess,
-                    "\tinitializing " + section.getName() + " section (" + section.getLength() + " pages)");
+                "\tinitializing " + section.getName() + " section (" + section.getLength() + " pages)");
 
             for (int i = 0; i < section.getLength(); i++) {
                 int vpn = section.getFirstVPN() + i;
@@ -686,7 +686,7 @@ public class UserProcess {
     }
 
     protected static final int syscallHalt = 0, syscallExit = 1, syscallExec = 2, syscallJoin = 3, syscallCreate = 4,
-            syscallOpen = 5, syscallRead = 6, syscallWrite = 7, syscallClose = 8, syscallUnlink = 9;
+        syscallOpen = 5, syscallRead = 6, syscallWrite = 7, syscallClose = 8, syscallUnlink = 9;
 
     /**
      * Handle a syscall exception. Called by <tt>handleException()</tt>. The
@@ -790,8 +790,8 @@ public class UserProcess {
         switch (cause) {
             case Processor.exceptionSyscall:
                 int result = handleSyscall(processor.readRegister(Processor.regV0),
-                        processor.readRegister(Processor.regA0), processor.readRegister(Processor.regA1),
-                        processor.readRegister(Processor.regA2), processor.readRegister(Processor.regA3));
+                    processor.readRegister(Processor.regA0), processor.readRegister(Processor.regA1),
+                    processor.readRegister(Processor.regA2), processor.readRegister(Processor.regA3));
                 processor.writeRegister(Processor.regV0, result);
                 processor.advancePC();
                 break;

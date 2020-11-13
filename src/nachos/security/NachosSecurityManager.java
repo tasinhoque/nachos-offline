@@ -21,7 +21,7 @@ public class NachosSecurityManager extends SecurityManager {
     /**
      * Allocate a new Nachos security manager.
      *
-     * @param    testDirectory    the directory usable by the stub file system.
+     * @param testDirectory the directory usable by the stub file system.
      */
     public NachosSecurityManager(File testDirectory) {
         this.testDirectory = testDirectory;
@@ -170,7 +170,7 @@ public class NachosSecurityManager extends SecurityManager {
      * Check the specified permission. Some operations are permissible while
      * not grading. These operations are regulated here.
      *
-     * @param    perm    the permission to check.
+     * @param perm the permission to check.
      */
     public void checkPermission(Permission perm) {
         String name = perm.getName();
@@ -295,7 +295,7 @@ public class NachosSecurityManager extends SecurityManager {
      * Verify that the caller is privileged, so as to check the specified
      * permission.
      *
-     * @param    perm    the permission being checked.
+     * @param perm the permission being checked.
      */
     public void verifyPrivilege(Permission perm) {
         if (!isPrivileged())
