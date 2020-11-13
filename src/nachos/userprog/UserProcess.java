@@ -561,7 +561,7 @@ public class UserProcess {
 
         return byteTransferred;
     }
-    public int handleExec( int vAddress, int numOfArguments, int argumentAddress)
+    private int handleExec( int vAddress, int numOfArguments, int argumentAddress)
     {
         String fName= null;
 
@@ -609,6 +609,80 @@ public class UserProcess {
         child.parent=this;
         this.children.add(child);
         return child.PID;
+
+    }
+    private int handleJoin(int id,int address)
+    {
+        UserProcess child=null;
+        int numOfChildren=children.size();
+
+        if(id<0 || address<0){
+            Lib.debug(dbgProcess,"HandleJoin: parameter is invalid");
+            return -1;
+        }
+        for(int i=0;i<numOfChildren;i++)
+        {
+            if(children.get(i).getPid()==id)
+            {
+                child=children.get(i);
+                break;
+            }
+        }
+        if(child==null){
+            Lib.debug(dbgProcess, "HandleJoin:No child with the processID");
+            return -1;
+        }
+
+
+        child.thread.join();
+        child.parent=null;
+
+
+        children.remove(child);
+
+        statusLock.acquire();
+        Integer status=childrenExitStatus.get(child.PID);
+        statusLock.release();
+
+        if(status == null)
+        {
+            Lib.debug(dbgProcess, "HandleJoin:Exit status of the child is missing");
+            return 0;
+        }
+        else {
+            byte container[] =new byte[4];
+            Lib.bytesFromInt(status);
+            int cnt=writeVirtualMemory(address,container);
+
+            if(cnt==4) return 1;
+            else
+            {
+                Lib.debug(dbgProcess, "HandleJoin : write status  operation is failed   ");
+                return 0;
+            }
+
+        }
+
+    }
+
+    private int handleExit(int st)
+    {
+        int totalChildren = children.size();
+
+        if(parent!= null){
+            parent.statusLock.acquire();
+            //  status is returned to the parent process as this process's exit status and
+            //can be collected using the join syscall
+            parent.childrenExitStatus.put(PID,st);
+            parent.statusLock.release();
+
+        }
+
+        unloadSections();
+        for(int i=0;i<totalChildren;i++)children.removeFirst().parent = null;
+        if(PID==0) 	Kernel.kernel.terminate();
+        else 	UThread.finish();
+        return  0;
 
     }
     private static final int
@@ -660,8 +734,11 @@ public class UserProcess {
             case syscallWrite:
                 return handleWrite(a0, a1, a2);
             case syscallExec:
+                return handleExec(a0,a1,a2);
             case syscallJoin:
+                return handleJoin(a0, a1);
             case syscallExit:
+                return handleExit(a0);
 
             default:
                 Lib.debug(dbgProcess, "Unknown syscall " + syscall);
