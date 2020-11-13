@@ -1,7 +1,10 @@
-Task 1: Nibir
+Part 2
 
-Task 2 & 4: Tasin
-
-Task 3: Enan 
-
-Task 5: Je jar part 
+- [x] Task 2
+  - [x] `UserKernel`
+  - [x] `UserProcess`
+    - [x] `lookUpPageTable()`
+    - [x] `readVirtualMemory()`
+    - [x] `writeVirtualMemory()`
+    - [x] `loadSections()`
+    - [x] `unloadSections()`

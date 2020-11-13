@@ -2,7 +2,7 @@ package nachos.userprog;
 
 import nachos.machine.*;
 import nachos.threads.*;
-import nachos.userprog.*;
+import java.util.LinkedList;
 
 /**
  * A kernel that can support multiple user processes.
@@ -29,6 +29,20 @@ public class UserKernel extends ThreadedKernel {
                 exceptionHandler();
             }
         });
+
+        offsetLen = 0;
+        for (offsetLen = 0;; ++offsetLen)
+            if ((Processor.pageSize >> offsetLen) == 1) {
+                offsetMask = (1 << offsetLen) - 1;
+                break;
+            }
+
+        pageLock = new Lock();
+
+        int numPhysPages = Machine.processor().getNumPhysPages();
+        availablePages = new LinkedList<Integer>();
+        for (int i = 0; i < numPhysPages; ++i)
+            availablePages.add(new Integer(i));
     }
 
     /**
@@ -45,8 +59,7 @@ public class UserKernel extends ThreadedKernel {
         do {
             c = (char) console.readByte(true);
             console.writeByte(c);
-        }
-        while (c != 'q');
+        } while (c != 'q');
 
         System.out.println("");
     }
@@ -95,11 +108,12 @@ public class UserKernel extends ThreadedKernel {
         super.run();
 
         UserProcess process = UserProcess.newUserProcess();
+        root = process;
 
         String shellProgram = Machine.getShellProgramName();
-        Lib.assertTrue(process.execute(shellProgram, new String[]{}));
+        Lib.assertTrue(process.execute(shellProgram, new String[] {}));
 
-        KThread.currentThread().finish();
+        KThread.finish();
     }
 
     /**
@@ -109,11 +123,52 @@ public class UserKernel extends ThreadedKernel {
         super.terminate();
     }
 
+    public static int getVirtualPageNumber(int vaddr) {
+        return Machine.processor().pageFromAddress(vaddr);
+    }
+
+    public static int getOffset(int vaddr) {
+        return vaddr & offsetMask;
+    }
+
+    public static int makeAddress(int pn, int offset) {
+        return Machine.processor().makeAddress(pn, offset);
+    }
+
+    public static int newPage() {
+        int ret = -1;
+
+        pageLock.acquire();
+        if (availablePages.size() > 0)
+            ret = availablePages.removeFirst().intValue();
+        pageLock.release();
+
+        return ret;
+    }
+
+    public static boolean deletePage(int ppn) {
+        boolean ret = false;
+
+        pageLock.acquire();
+        availablePages.add(new Integer(ppn));
+        ret = true;
+        pageLock.release();
+
+        return ret;
+    }
+
+    public String absoluteFileName(String s) {
+        return s;
+    }
+
     /**
      * Globally accessible reference to the synchronized console.
      */
+    protected UserProcess root;
     public static SynchConsole console;
 
-    // dummy variables to make javac smarter
-    private static Coff dummy1 = null;
+    private static int offsetLen, offsetMask;
+
+    private static Lock pageLock;
+    private static LinkedList<Integer> availablePages;
 }
