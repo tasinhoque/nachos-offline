@@ -4,6 +4,7 @@ import nachos.machine.*;
 import nachos.threads.*;
 
 import java.io.EOFException;
+import java.util.LinkedList;
 
 /**
  * Encapsulates the state of a user process that is not contained in its
@@ -417,8 +418,56 @@ public class UserProcess {
 
         return byteTransferred;
     }
+    public int handleExec( int vAddress, int numOfArguments, int argumentAddress)
+    {
+        String fName= null;
+
+        if(vAddress<0 || numOfArguments <0 || argumentAddress <0)
+        {
+            Lib.debug(dbgProcess,"HandleExec : Parameter is invalid");
+            return -1;
+        }
+        fName=readVirtualMemoryString(vAddress, 256);
+        if(fName == null) {
+            Lib.debug(dbgProcess,"HnadleExec : Failure in reading filename");
+            return  -1;
+        }
+        if(!fName.contains(".coff")){
+            Lib.debug(dbgProcess, "HandleExec:  Only .coff files are allowed");
+            return -1;
+        }
+        String arguments[]=  new String[numOfArguments];
+        for( int  i=0 ;i<numOfArguments;i++)
+        {
+            int len=-1;
+            byte container[] =  new byte[4];
+            len=readVirtualMemory(argumentAddress+i*4,container);
+
+            if(len!=4){
+                Lib.debug(dbgProcess,"HandleExec: Argument Address can not be read");
+                return  -1;
+            }
+            String argName=  readVirtualMemoryString(Lib.bytesToInt(container, 0),256);
+            if(argName == null){
+                Lib.debug(dbgProcess,"HandleExec: Found the argument null");
+                return -1;
+
+            }
+            arguments[i]=argName;
 
 
+        }
+        UserProcess child= UserProcess.newUserProcess();
+        if(!child.execute(fName,arguments))
+        {
+            Lib.debug(dbgProcess,"HandleExec: Child process cannot be executed");
+            return -1;
+        }
+        child.parent=this;
+        this.childProcesses.add(child);
+        return child.processId;
+
+    }
     private static final int
         syscallHalt = 0,
         syscallExit = 1,
@@ -467,6 +516,9 @@ public class UserProcess {
                 return handleRead(a0, a1, a2);
             case syscallWrite:
                 return handleWrite(a0, a1, a2);
+            case syscallExec:
+            case syscallJoin:
+            case syscallExit:
 
 
             default:
@@ -527,6 +579,11 @@ public class UserProcess {
 
     private int initialPC, initialSP;
     private int argc, argv;
+
+    protected int processId;
+    protected UserProcess parent;
+    protected LinkedList<UserProcess> childProcesses;
+
 
     private static final int pageSize = Processor.pageSize;
     private static final char dbgProcess = 'a';
