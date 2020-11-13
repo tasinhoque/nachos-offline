@@ -71,7 +71,7 @@ public class UserProcess {
             return false;
 
         Lib.debug(dbgProcess, "process created, pid = " + pID);
-        //
+
         thread = (UThread) (new UThread(this).setName(name));
         thread.fork();
 
@@ -97,18 +97,39 @@ public class UserProcess {
         return pID;
     }
 
+    /**
+     * Allocates pages of physical memory.
+     *
+     * @param vpn the virtual page whereafter to allocate the memory
+     * @param desiredPages the amount of physical pages to allocate
+     */
     protected boolean allocate(int vpn, int desiredPages, boolean readOnly) {
-        //    	System.out.println("hehe");
+
+        /*
+         * Tracks the allocated pages.
+         * We allocate one page at a time and add it to this LinkedList.
+         * If we encounter any error, we can revert to previous state
+         * using this LinkedList and return failure.
+         */
         LinkedList<TranslationEntry> allocated = new LinkedList<TranslationEntry>();
 
         for (int i = 0; i < desiredPages; ++i) {
+            /*
+             * This check seems like it should outside this foor loop.
+             * But I'm not gonna mess with it since it's already working.
+             */
             if (vpn >= pageTable.length)
                 return false;
 
+            // Allocate a physical page
             int ppn = UserKernel.newPage();
             if (ppn == -1) {
                 Lib.debug(dbgProcess, "\tcannot allocate new page");
 
+                /*
+                 * Encountered error. Need to deallocate all the pages
+                 * we previously allocated in this loop.
+                 */
                 for (TranslationEntry te : allocated) {
                     pageTable[te.vpn] = new TranslationEntry(te.vpn, 0, false, false, false, false);
                     UserKernel.deletePage(te.ppn);
@@ -116,13 +137,25 @@ public class UserProcess {
                 }
 
                 return false;
+
             } else {
                 TranslationEntry a = new TranslationEntry(vpn + i, ppn, true, readOnly, false, false);
+
+                /*
+                 * Keep track of the allocated physical pages.
+                 * We might need to deallocate them.
+                 */
                 allocated.add(a);
+
+                /*
+                 * Update the process's page table
+                 * with the newly allocated physical page.
+                 */
                 pageTable[vpn + i] = a;
                 ++numPages;
             }
         }
+
         return true;
     }
 
@@ -371,7 +404,7 @@ public class UserProcess {
         int argsSize = 0;
         for (int i = 0; i < args.length; i++) {
             argv[i] = args[i].getBytes();
-            // 4 bytes for argv[] pointer; then string plus one for null byte
+            // NOTE: 4 bytes for argv[] pointer; then string plus one for null byte
             argsSize += 4 + argv[i].length + 1;
         }
         if (argsSize > pageSize) {
