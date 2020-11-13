@@ -494,6 +494,122 @@ public class UserProcess {
         return 0;
     }
 
+    private int handleExit(int st) {
+        int totalChildren = children.size();
+
+        if (parent != null) {
+            parent.statusLock.acquire();
+            //  status is returned to the parent process as this process's exit status and
+            //can be collected using the join syscall
+            parent.childrenExitStatus.put(PID, st);
+            parent.statusLock.release();
+
+        }
+
+        unloadSections();
+        for (int i = 0; i < totalChildren; i++)
+            children.removeFirst().parent = null;
+        if (PID == 0)
+            Kernel.kernel.terminate();
+        else
+            UThread.finish();
+        return 0;
+
+    }
+
+    private int handleExec(int vAddress, int numOfArguments, int argumentAddress) {
+        String fName = null;
+
+        if (vAddress < 0 || numOfArguments < 0 || argumentAddress < 0) {
+            Lib.debug(dbgProcess, "HandleExec : Parameter is invalid");
+            return -1;
+        }
+        fName = readVirtualMemoryString(vAddress, 256);
+        if (fName == null) {
+            Lib.debug(dbgProcess, "HnadleExec : Failure in reading filename");
+            return -1;
+        }
+        if (!fName.contains(".coff")) {
+            Lib.debug(dbgProcess, "HandleExec:  Only .coff files are allowed");
+            return -1;
+        }
+        String arguments[] = new String[numOfArguments];
+        for (int i = 0; i < numOfArguments; i++) {
+            int len = -1;
+            byte container[] = new byte[4];
+            len = readVirtualMemory(argumentAddress + i * 4, container);
+
+            if (len != 4) {
+                Lib.debug(dbgProcess, "HandleExec: Argument Address can not be read");
+                return -1;
+            }
+            String argName = readVirtualMemoryString(Lib.bytesToInt(container, 0), 256);
+            if (argName == null) {
+                Lib.debug(dbgProcess, "HandleExec: Found the argument null");
+                return -1;
+
+            }
+            arguments[i] = argName;
+
+        }
+        UserProcess child = UserProcess.newUserProcess();
+        if (!child.execute(fName, arguments)) {
+            Lib.debug(dbgProcess, "HandleExec: Child process cannot be executed");
+            return -1;
+        }
+        child.parent = this;
+        this.children.add(child);
+        return child.PID;
+
+    }
+
+    private int handleJoin(int id, int address) {
+        UserProcess child = null;
+        int numOfChildren = children.size();
+
+        if (id < 0 || address < 0) {
+            Lib.debug(dbgProcess, "HandleJoin: parameter is invalid");
+            return -1;
+        }
+        for (int i = 0; i < numOfChildren; i++) {
+            if (children.get(i).getPid() == id) {
+                child = children.get(i);
+                break;
+            }
+        }
+        if (child == null) {
+            Lib.debug(dbgProcess, "HandleJoin:No child with the processID");
+            return -1;
+        }
+
+        child.thread.join();
+        child.parent = null;
+
+        children.remove(child);
+
+        statusLock.acquire();
+        Integer status = childrenExitStatus.get(child.PID);
+        statusLock.release();
+
+        if (status == null) {
+            Lib.debug(dbgProcess, "HandleJoin:Exit status of the child is missing");
+            return 0;
+        } else {
+            byte container[] = new byte[4];
+            container = Lib.bytesFromInt(status);
+            int cnt = writeVirtualMemory(address, container);
+
+            if (cnt == 4)
+                return 1;
+            else {
+                Lib.debug(dbgProcess, "HandleJoin : write status  operation is failed   ");
+                return 0;
+            }
+
+        }
+
+    }
+
     private int handleRead(int fileDescriptor, int vaddr, int size) {
         if (fileDescriptor < 0 || fileDescriptor >= MAX_FILES) {
             Lib.debug(dbgProcess, "handleRead: File descriptor out of range.");
@@ -559,141 +675,9 @@ public class UserProcess {
 
         return byteTransferred;
     }
-    private int handleExec( int vAddress, int numOfArguments, int argumentAddress)
-    {
-        String fName= null;
 
-        if(vAddress<0 || numOfArguments <0 || argumentAddress <0)
-        {
-            Lib.debug(dbgProcess,"HandleExec : Parameter is invalid");
-            return -1;
-        }
-        fName=readVirtualMemoryString(vAddress, 256);
-        if(fName == null) {
-            Lib.debug(dbgProcess,"HnadleExec : Failure in reading filename");
-            return  -1;
-        }
-        if(!fName.contains(".coff")){
-            Lib.debug(dbgProcess, "HandleExec:  Only .coff files are allowed");
-            return -1;
-        }
-        String arguments[]=  new String[numOfArguments];
-        for( int  i=0 ;i<numOfArguments;i++)
-        {
-            int len=-1;
-            byte container[] =  new byte[4];
-            len=readVirtualMemory(argumentAddress+i*4,container);
-
-            if(len!=4){
-                Lib.debug(dbgProcess,"HandleExec: Argument Address can not be read");
-                return  -1;
-            }
-            String argName=  readVirtualMemoryString(Lib.bytesToInt(container, 0),256);
-            if(argName == null){
-                Lib.debug(dbgProcess,"HandleExec: Found the argument null");
-                return -1;
-
-            }
-            arguments[i]=argName;
-
-
-        }
-        UserProcess child= UserProcess.newUserProcess();
-        if(!child.execute(fName,arguments))
-        {
-            Lib.debug(dbgProcess,"HandleExec: Child process cannot be executed");
-            return -1;
-        }
-        child.parent=this;
-        this.children.add(child);
-        return child.PID;
-
-    }
-    private int handleJoin(int id,int address)
-    {
-        UserProcess child=null;
-        int numOfChildren=children.size();
-
-        if(id<0 || address<0){
-            Lib.debug(dbgProcess,"HandleJoin: parameter is invalid");
-            return -1;
-        }
-        for(int i=0;i<numOfChildren;i++)
-        {
-            if(children.get(i).getPid()==id)
-            {
-                child=children.get(i);
-                break;
-            }
-        }
-        if(child==null){
-            Lib.debug(dbgProcess, "HandleJoin:No child with the processID");
-            return -1;
-        }
-
-
-        child.thread.join();
-        child.parent=null;
-
-
-        children.remove(child);
-
-        statusLock.acquire();
-        Integer status=childrenExitStatus.get(child.PID);
-        statusLock.release();
-
-        if(status == null)
-        {
-            Lib.debug(dbgProcess, "HandleJoin:Exit status of the child is missing");
-            return 0;
-        }
-        else {
-            byte container[] =new byte[4];
-            Lib.bytesFromInt(status);
-            int cnt=writeVirtualMemory(address,container);
-
-            if(cnt==4) return 1;
-            else
-            {
-                Lib.debug(dbgProcess, "HandleJoin : write status  operation is failed   ");
-                return 0;
-            }
-
-        }
-
-    }
-
-    private int handleExit(int st)
-    {
-        int totalChildren = children.size();
-
-        if(parent!= null){
-            parent.statusLock.acquire();
-            //  status is returned to the parent process as this process's exit status and
-            //can be collected using the join syscall
-            parent.childrenExitStatus.put(PID,st);
-            parent.statusLock.release();
-
-        }
-
-        unloadSections();
-        for(int i=0;i<totalChildren;i++)children.removeFirst().parent = null;
-        if(PID==0) 	Kernel.kernel.terminate();
-        else 	UThread.finish();
-        return  0;
-
-    }
-    private static final int
-        syscallHalt = 0,
-        syscallExit = 1,
-        syscallExec = 2,
-        syscallJoin = 3,
-        syscallCreate = 4,
-        syscallOpen = 5,
-        syscallRead = 6,
-        syscallWrite = 7,
-        syscallClose = 8,
-        syscallUnlink = 9;
+    private static final int syscallHalt = 0, syscallExit = 1, syscallExec = 2, syscallJoin = 3, syscallCreate = 4,
+            syscallOpen = 5, syscallRead = 6, syscallWrite = 7, syscallClose = 8, syscallUnlink = 9;
 
     /**
      * Handle a syscall exception. Called by <tt>handleException()</tt>. The
@@ -732,7 +716,7 @@ public class UserProcess {
             case syscallWrite:
                 return handleWrite(a0, a1, a2);
             case syscallExec:
-                return handleExec(a0,a1,a2);
+                return handleExec(a0, a1, a2);
             case syscallJoin:
                 return handleJoin(a0, a1);
             case syscallExit:
