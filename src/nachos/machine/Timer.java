@@ -18,8 +18,8 @@ public final class Timer {
     /**
      * Allocate a new timer.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
+     * @param privilege encapsulates privileged access to the Nachos
+     *                  machine.
      */
     public Timer(Privilege privilege) {
         System.out.print(" timer");
@@ -46,7 +46,7 @@ public final class Timer {
      * Set the callback to use as a timer interrupt handler. The timer
      * interrupt handler will be called approximately every 500 clock ticks.
      *
-     * @param    handler        the timer interrupt handler.
+     * @param handler the timer interrupt handler.
      */
     public void setInterruptHandler(Runnable handler) {
         this.handler = handler;

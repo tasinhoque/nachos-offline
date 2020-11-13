@@ -2,6 +2,7 @@ package nachos.userprog;
 
 import nachos.machine.*;
 import nachos.threads.*;
+
 import java.util.LinkedList;
 
 /**
@@ -31,7 +32,7 @@ public class UserKernel extends ThreadedKernel {
         });
 
         offsetLen = 0;
-        for (offsetLen = 0;; ++offsetLen)
+        for (offsetLen = 0; ; ++offsetLen)
             if ((Processor.pageSize >> offsetLen) == 1) {
                 offsetMask = (1 << offsetLen) - 1;
                 break;
@@ -102,7 +103,7 @@ public class UserKernel extends ThreadedKernel {
      * program in it. The name of the shell program it must run is returned by
      * <tt>Machine.getShellProgramName()</tt>.
      *
-     * @see    nachos.machine.Machine#getShellProgramName
+     * @see nachos.machine.Machine#getShellProgramName
      */
     public void run() {
         super.run();
@@ -111,7 +112,7 @@ public class UserKernel extends ThreadedKernel {
         root = process;
 
         String shellProgram = Machine.getShellProgramName();
-        Lib.assertTrue(process.execute(shellProgram, new String[] {}));
+        Lib.assertTrue(process.execute(shellProgram, new String[]{}));
 
         KThread.finish();
     }

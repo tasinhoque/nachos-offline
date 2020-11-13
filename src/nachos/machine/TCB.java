@@ -34,8 +34,8 @@ public final class TCB {
      * necessary, because unlike other machine classes that need privilege, we
      * want the kernel to be able to create TCB objects on its own.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
+     * @param privilege encapsulates privileged access to the Nachos
+     *                  machine.
      */
     public static void givePrivilege(Privilege privilege) {
         TCB.privilege = privilege;
@@ -203,7 +203,7 @@ public final class TCB {
      * Test if the current JVM thread belongs to a Nachos TCB. The AWT event
      * dispatcher is an example of a non-Nachos thread.
      *
-     * @return    <tt>true</tt> if the current JVM thread is a Nachos thread.
+     * @return <tt>true</tt> if the current JVM thread is a Nachos thread.
      */
     public static boolean isNachosThread() {
         return (currentTCB != null &&

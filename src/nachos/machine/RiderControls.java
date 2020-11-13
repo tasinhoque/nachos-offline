@@ -29,7 +29,7 @@ public interface RiderControls {
      * Set the rider's interrupt handler. This handler will be called when the
      * rider observes an event.
      *
-     * @param    handler    the rider's interrupt handler.
+     * @param handler the rider's interrupt handler.
      */
     public void setInterruptHandler(Runnable handler);
 
@@ -55,9 +55,9 @@ public interface RiderControls {
      * Return the indicated direction of the specified elevator, set by
      * <tt>ElevatorControls.setDirectionDisplay()</tt>.
      *
-     * @param    elevator    the elevator to check the direction of.
+     * @param elevator the elevator to check the direction of.
      * @return the displayed direction for the elevator.
-     * @see    nachos.machine.ElevatorControls#setDirectionDisplay
+     * @see nachos.machine.ElevatorControls#setDirectionDisplay
      */
     public int getDirectionDisplay(int elevator);
 
@@ -65,8 +65,8 @@ public interface RiderControls {
      * Press a direction button. If <tt>up</tt> is <tt>true</tt>, invoke
      * <tt>pressUpButton()</tt>; otherwise, invoke <tt>pressDownButton()</tt>.
      *
-     * @param    up    <tt>true</tt> to press the up button, <tt>false</tt> to
-     * press the down button.
+     * @param up <tt>true</tt> to press the up button, <tt>false</tt> to
+     *           press the down button.
      * @return the return value of <tt>pressUpButton()</tt> or of
      * <tt>pressDownButton()</tt>.
      */
@@ -78,7 +78,7 @@ public interface RiderControls {
      * rider, has the doors open, and says it is going up, does nothing and
      * returns <tt>false</tt>.
      *
-     * @return    <tt>true</tt> if the button event was sent to the elevator
+     * @return <tt>true</tt> if the button event was sent to the elevator
      * controller.
      */
     public boolean pressUpButton();
@@ -89,7 +89,7 @@ public interface RiderControls {
      * as this rider, has the doors open, and says it is going down, does
      * nothing and returns <tt>false</tt>.
      *
-     * @return    <tt>true</tt> if the button event was sent to the elevator
+     * @return <tt>true</tt> if the button event was sent to the elevator
      * controller.
      */
     public boolean pressDownButton();
@@ -99,8 +99,8 @@ public interface RiderControls {
      * open at the same floor, or if the elevator is full. The rider must not
      * already be in an elevator.
      *
-     * @param    elevator    the elevator to enter.
-     * @return    <tt>true</tt> if the rider successfully entered the elevator.
+     * @param elevator the elevator to enter.
+     * @return <tt>true</tt> if the rider successfully entered the elevator.
      */
     public boolean enterElevator(int elevator);
 
@@ -109,8 +109,8 @@ public interface RiderControls {
      * elevator already has its doors open on <tt>floor</tt>, does nothing and
      * returns <tt>false</tt>.
      *
-     * @param    floor    the button to press.
-     * @return    <tt>true</tt> if the button event was sent to the elevator
+     * @param floor the button to press.
+     * @return <tt>true</tt> if the button event was sent to the elevator
      * controller.
      */
     public boolean pressFloorButton(int floor);
@@ -119,8 +119,8 @@ public interface RiderControls {
      * Exit the elevator. A rider cannot exit the elevator if its doors are not
      * open on the requested floor. The rider must already be in an elevator.
      *
-     * @param    floor    the floor to exit on.
-     * @return    <tt>true</tt> if the rider successfully got off the elevator.
+     * @param floor the floor to exit on.
+     * @return <tt>true</tt> if the rider successfully got off the elevator.
      */
     public boolean exitElevator(int floor);
 

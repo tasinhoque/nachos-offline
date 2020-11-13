@@ -31,11 +31,11 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
-        boolean inStatus=Machine.interrupt().disable();
-        while(!waitQueue.isEmpty()
-                && waitQueue.peek().wakeTime <= Machine.timer().getTime()) {
-            Lib.debug(dbgAlarm, "Waking up thread " +  waitQueue.peek().thread.toString()
-                    + " at " + Machine.timer().getTime() + " cycles");
+        boolean inStatus = Machine.interrupt().disable();
+        while (!waitQueue.isEmpty()
+            && waitQueue.peek().wakeTime <= Machine.timer().getTime()) {
+            Lib.debug(dbgAlarm, "Waking up thread " + waitQueue.peek().thread.toString()
+                + " at " + Machine.timer().getTime() + " cycles");
             waitQueue.poll().thread.ready();
         }
         KThread.yield();
@@ -52,8 +52,8 @@ public class Alarm {
      * (current time) >= (WaitUntil called time)+(x)
      * </blockquote>
      *
-     * @param    x    the minimum number of clock ticks to wait.
-     * @see    nachos.machine.Timer#getTime()
+     * @param x the minimum number of clock ticks to wait.
+     * @see nachos.machine.Timer#getTime()
      */
     // Todo: Part 1, Task 3
     public void waitUntil(long x) {
@@ -62,7 +62,7 @@ public class Alarm {
 
         boolean inStatus = Machine.interrupt().disable();
         Lib.debug(dbgAlarm, "At " + (wakeTime - x) + " cycles, sleeping thread "
-                + KThread.currentThread().toString() + " until " + wakeTime + " cycles");
+            + KThread.currentThread().toString() + " until " + wakeTime + " cycles");
         waitQueue.add(new WaitThread(KThread.currentThread(), wakeTime));
         KThread.sleep();
         Machine.interrupt().restore(inStatus);
@@ -72,12 +72,12 @@ public class Alarm {
         KThread thread;
         long wakeTime;
 
-        public WaitThread(KThread thread, long wakeTime){
+        public WaitThread(KThread thread, long wakeTime) {
             this.thread = thread;
             this.wakeTime = wakeTime;
         }
 
-        public int compareTo(WaitThread thread){
+        public int compareTo(WaitThread thread) {
             return Long.compare(this.wakeTime, thread.wakeTime);
 
         }
@@ -90,7 +90,7 @@ public class Alarm {
         class RunAlarm implements Runnable {
             @Override
             public void run() {
-                long tick = (int)(Math.random() * 1000) + 500;
+                long tick = (int) (Math.random() * 1000) + 500;
                 ThreadedKernel.alarm.waitUntil(tick);
             }
         }

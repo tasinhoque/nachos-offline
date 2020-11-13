@@ -22,7 +22,7 @@ public class SynchList {
      * Add the specified object to the end of the queue. If another thread is
      * waiting in <tt>removeFirst()</tt>, it is woken up.
      *
-     * @param    o    the object to add. Must not be <tt>null</tt>.
+     * @param o the object to add. Must not be <tt>null</tt>.
      */
     public void add(Object o) {
         Lib.assertTrue(o != null);

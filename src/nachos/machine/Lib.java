@@ -37,7 +37,7 @@ public final class Lib {
     /**
      * Seed the random number generater. May only be called once.
      *
-     * @param    randomSeed    the seed for the random number generator.
+     * @param randomSeed the seed for the random number generator.
      */
     public static void seedRandom(long randomSeed) {
         assertTrue(random == null);
@@ -48,8 +48,8 @@ public final class Lib {
      * Return a random integer between 0 and <i>range - 1</i>. Must not be
      * called before <tt>seedRandom()</tt> seeds the random number generator.
      *
-     * @param    range    a positive value specifying the number of possible
-     * return values.
+     * @param range a positive value specifying the number of possible
+     *              return values.
      * @return a random integer in the specified range.
      */
     public static int random(int range) {
@@ -70,7 +70,7 @@ public final class Lib {
      * Asserts that <i>expression</i> is <tt>true</tt>. If not, then Nachos
      * exits with an error message.
      *
-     * @param    expression    the expression to assert.
+     * @param expression the expression to assert.
      */
     public static void assertTrue(boolean expression) {
         if (!expression)
@@ -81,8 +81,8 @@ public final class Lib {
      * Asserts that <i>expression</i> is <tt>true</tt>. If not, then Nachos
      * exits with the specified error message.
      *
-     * @param    expression    the expression to assert.
-     * @param    message        the error message.
+     * @param expression the expression to assert.
+     * @param message    the error message.
      */
     public static void assertTrue(boolean expression, String message) {
         if (!expression)
@@ -100,7 +100,7 @@ public final class Lib {
      * Asserts that this call is never made, with the specified error messsage.
      * Same as <tt>assertTrue(false, message)</tt>.
      *
-     * @param    message    the error message.
+     * @param message the error message.
      */
     public static void assertNotReached(String message) {
         assertTrue(false, message);
@@ -118,8 +118,8 @@ public final class Lib {
      * Nachos uses several debugging flags already, but you are encouraged to
      * add your own.
      *
-     * @param    flag    the debug flag that must be set to print this message.
-     * @param    message    the debug message.
+     * @param flag    the debug flag that must be set to print this message.
+     * @param message the debug message.
      */
     public static void debug(char flag, String message) {
         if (test(flag))
@@ -129,8 +129,8 @@ public final class Lib {
     /**
      * Tests if <i>flag</i> was enabled on the command line.
      *
-     * @param    flag    the debug flag to test.
-     * @return    <tt>true</tt> if this flag was enabled on the command line.
+     * @param flag the debug flag to test.
+     * @return <tt>true</tt> if this flag was enabled on the command line.
      */
     public static boolean test(char flag) {
         if (debugFlags == null)
@@ -146,7 +146,7 @@ public final class Lib {
     /**
      * Enable all the debug flags in <i>flagsString</i>.
      *
-     * @param    flagsString    the flags to enable.
+     * @param flagsString the flags to enable.
      */
     public static void enableDebugFlags(String flagsString) {
         if (debugFlags == null)
@@ -169,11 +169,11 @@ public final class Lib {
      * Read a file, verifying that the requested number of bytes is read, and
      * verifying that the read operation took a non-zero amount of time.
      *
-     * @param    file        the file to read.
-     * @param    position    the file offset at which to start reading.
-     * @param    buf        the buffer in which to store the data.
-     * @param    offset        the buffer offset at which storing begins.
-     * @param    length        the number of bytes to read.
+     * @param file     the file to read.
+     * @param position the file offset at which to start reading.
+     * @param buf      the buffer in which to store the data.
+     * @param offset   the buffer offset at which storing begins.
+     * @param length   the number of bytes to read.
      */
     public static void strictReadFile(OpenFile file, int position,
                                       byte[] buf, int offset, int length) {
@@ -186,7 +186,7 @@ public final class Lib {
     /**
      * Load an entire file into memory.
      *
-     * @param    file    the file to load.
+     * @param file the file to load.
      * @return an array containing the contents of the entire file, or
      * <tt>null</tt> if an error occurred.
      */
@@ -212,7 +212,7 @@ public final class Lib {
     /**
      * Take a read-only snapshot of a file.
      *
-     * @param    file    the file to take a snapshot of.
+     * @param file the file to take a snapshot of.
      * @return a read-only snapshot of the file.
      */
     public static OpenFile cloneFile(OpenFile file) {
@@ -226,9 +226,9 @@ public final class Lib {
     /**
      * Convert a short into its little-endian byte string representation.
      *
-     * @param    array    the array in which to store the byte string.
-     * @param    offset    the offset in the array where the string will start.
-     * @param    value    the value to convert.
+     * @param array  the array in which to store the byte string.
+     * @param offset the offset in the array where the string will start.
+     * @param value  the value to convert.
      */
     public static void bytesFromShort(byte[] array, int offset, short value) {
         array[offset + 0] = (byte) ((value >> 0) & 0xFF);
@@ -238,9 +238,9 @@ public final class Lib {
     /**
      * Convert an int into its little-endian byte string representation.
      *
-     * @param    array    the array in which to store the byte string.
-     * @param    offset    the offset in the array where the string will start.
-     * @param    value    the value to convert.
+     * @param array  the array in which to store the byte string.
+     * @param offset the offset in the array where the string will start.
+     * @param value  the value to convert.
      */
     public static void bytesFromInt(byte[] array, int offset, int value) {
         array[offset + 0] = (byte) ((value >> 0) & 0xFF);
@@ -253,7 +253,7 @@ public final class Lib {
      * Convert an int into its little-endian byte string representation, and
      * return an array containing it.
      *
-     * @param    value    the value to convert.
+     * @param value the value to convert.
      * @return an array containing the byte string.
      */
     public static byte[] bytesFromInt(int value) {
@@ -266,10 +266,10 @@ public final class Lib {
      * Convert an int into a little-endian byte string representation of the
      * specified length.
      *
-     * @param    array    the array in which to store the byte string.
-     * @param    offset    the offset in the array where the string will start.
-     * @param    length    the number of bytes to store (must be 1, 2, or 4).
-     * @param    value    the value to convert.
+     * @param array  the array in which to store the byte string.
+     * @param offset the offset in the array where the string will start.
+     * @param length the number of bytes to store (must be 1, 2, or 4).
+     * @param value  the value to convert.
      */
     public static void bytesFromInt(byte[] array, int offset,
                                     int length, int value) {
@@ -291,8 +291,8 @@ public final class Lib {
     /**
      * Convert to a short from its little-endian byte string representation.
      *
-     * @param    array    the array containing the byte string.
-     * @param    offset    the offset of the byte string in the array.
+     * @param array  the array containing the byte string.
+     * @param offset the offset of the byte string in the array.
      * @return the corresponding short value.
      */
     public static short bytesToShort(byte[] array, int offset) {
@@ -304,8 +304,8 @@ public final class Lib {
      * Convert to an unsigned short from its little-endian byte string
      * representation.
      *
-     * @param    array    the array containing the byte string.
-     * @param    offset    the offset of the byte string in the array.
+     * @param array  the array containing the byte string.
+     * @param offset the offset of the byte string in the array.
      * @return the corresponding short value.
      */
     public static int bytesToUnsignedShort(byte[] array, int offset) {
@@ -315,8 +315,8 @@ public final class Lib {
     /**
      * Convert to an int from its little-endian byte string representation.
      *
-     * @param    array    the array containing the byte string.
-     * @param    offset    the offset of the byte string in the array.
+     * @param array  the array containing the byte string.
+     * @param offset the offset of the byte string in the array.
      * @return the corresponding int value.
      */
     public static int bytesToInt(byte[] array, int offset) {
@@ -330,9 +330,9 @@ public final class Lib {
      * Convert to an int from a little-endian byte string representation of the
      * specified length.
      *
-     * @param    array    the array containing the byte string.
-     * @param    offset    the offset of the byte string in the array.
-     * @param    length    the length of the byte string.
+     * @param array  the array containing the byte string.
+     * @param offset the offset of the byte string in the array.
+     * @param length the length of the byte string.
      * @return the corresponding value.
      */
     public static int bytesToInt(byte[] array, int offset, int length) {
@@ -353,9 +353,9 @@ public final class Lib {
     /**
      * Convert to a string from a possibly null-terminated array of bytes.
      *
-     * @param    array    the array containing the byte string.
-     * @param    offset    the offset of the byte string in the array.
-     * @param    length    the maximum length of the byte string.
+     * @param array  the array containing the byte string.
+     * @param offset the offset of the byte string in the array.
+     * @param length the maximum length of the byte string.
      * @return a string containing the specified bytes, up to and not
      * including the null-terminator (if present).
      */
@@ -372,9 +372,9 @@ public final class Lib {
     /**
      * Mask out and shift a bit substring.
      *
-     * @param    bits    the bit string.
-     * @param    lowest    the first bit of the substring within the string.
-     * @param    size    the number of bits in the substring.
+     * @param bits   the bit string.
+     * @param lowest the first bit of the substring within the string.
+     * @param size   the number of bits in the substring.
      * @return the substring.
      */
     public static int extract(int bits, int lowest, int size) {
@@ -387,9 +387,9 @@ public final class Lib {
     /**
      * Mask out and shift a bit substring.
      *
-     * @param    bits    the bit string.
-     * @param    lowest    the first bit of the substring within the string.
-     * @param    size    the number of bits in the substring.
+     * @param bits   the bit string.
+     * @param lowest the first bit of the substring within the string.
+     * @param size   the number of bits in the substring.
      * @return the substring.
      */
     public static long extract(long bits, int lowest, int size) {
@@ -402,9 +402,9 @@ public final class Lib {
     /**
      * Mask out and shift a bit substring; then sign extend the substring.
      *
-     * @param    bits    the bit string.
-     * @param    lowest    the first bit of the substring within the string.
-     * @param    size    the number of bits in the substring.
+     * @param bits   the bit string.
+     * @param lowest the first bit of the substring within the string.
+     * @param size   the number of bits in the substring.
      * @return the substring, sign-extended.
      */
     public static int extend(int bits, int lowest, int size) {
@@ -415,9 +415,9 @@ public final class Lib {
     /**
      * Test if a bit is set in a bit string.
      *
-     * @param    flag    the flag to test.
-     * @param    bits    the bit string.
-     * @return    <tt>true</tt> if <tt>(bits & flag)</tt> is non-zero.
+     * @param flag the flag to test.
+     * @param bits the bit string.
+     * @return <tt>true</tt> if <tt>(bits & flag)</tt> is non-zero.
      */
     public static boolean test(long flag, long bits) {
         return ((bits & flag) != 0);
@@ -427,7 +427,7 @@ public final class Lib {
      * Creates a padded upper-case string representation of the integer
      * argument in base 16.
      *
-     * @param    i    an integer.
+     * @param i an integer.
      * @return a padded upper-case string representation in base 16.
      */
     public static String toHexString(int i) {
@@ -438,8 +438,8 @@ public final class Lib {
      * Creates a padded upper-case string representation of the integer
      * argument in base 16, padding to at most the specified number of digits.
      *
-     * @param    i    an integer.
-     * @param    pad    the minimum number of hex digits to pad to.
+     * @param i   an integer.
+     * @param pad the minimum number of hex digits to pad to.
      * @return a padded upper-case string representation in base 16.
      */
     public static String toHexString(int i, int pad) {
@@ -453,9 +453,9 @@ public final class Lib {
      * Divide two non-negative integers, round the quotient up to the nearest
      * integer, and return it.
      *
-     * @param    a    the numerator.
-     * @param    b    the denominator.
-     * @return    <tt>ceiling(a / b)</tt>.
+     * @param a the numerator.
+     * @param b the denominator.
+     * @return <tt>ceiling(a / b)</tt>.
      */
     public static int divRoundUp(int a, int b) {
         assertTrue(a >= 0 && b > 0);
@@ -467,7 +467,7 @@ public final class Lib {
      * Load and return the named class, or return <tt>null</tt> if the class
      * could not be loaded.
      *
-     * @param    className    the name of the class to load.
+     * @param className the name of the class to load.
      * @return the loaded class, or <tt>null</tt> if an error occurred.
      */
     public static Class tryLoadClass(String className) {
@@ -481,7 +481,7 @@ public final class Lib {
     /**
      * Load and return the named class, terminating Nachos on any error.
      *
-     * @param    className    the name of the class to load.
+     * @param className the name of the class to load.
      * @return the loaded class.
      */
     public static Class loadClass(String className) {
@@ -497,7 +497,7 @@ public final class Lib {
      * Create and return a new instance of the named class, using the
      * constructor that takes no arguments.
      *
-     * @param    className    the name of the class to instantiate.
+     * @param className the name of the class to instantiate.
      * @return a new instance of the class.
      */
     public static Object constructObject(String className) {
@@ -518,8 +518,8 @@ public final class Lib {
      * Verify that the specified class extends or implements the specified
      * superclass.
      *
-     * @param    cls    the descendant class.
-     * @param    superCls    the ancestor class.
+     * @param cls      the descendant class.
+     * @param superCls the ancestor class.
      */
     public static void checkDerivation(Class<?> cls, Class<?> superCls) {
         Lib.assertTrue(superCls.isAssignableFrom(cls));
@@ -529,8 +529,8 @@ public final class Lib {
      * Verifies that the specified class is public and not abstract, and that a
      * constructor with the specified signature exists and is public.
      *
-     * @param    cls    the class containing the constructor.
-     * @param    parameterTypes    the list of parameters.
+     * @param cls            the class containing the constructor.
+     * @param parameterTypes the list of parameters.
      */
     public static void checkConstructor(Class cls, Class[] parameterTypes) {
         try {
@@ -548,10 +548,10 @@ public final class Lib {
      * method with the specified name and signature exists, is public, and
      * returns the specified type.
      *
-     * @param    cls    the class containing the non-static method.
-     * @param    methodName    the name of the non-static method.
-     * @param    parameterTypes    the list of parameters.
-     * @param    returnType    the required return type.
+     * @param cls            the class containing the non-static method.
+     * @param methodName     the name of the non-static method.
+     * @param parameterTypes the list of parameters.
+     * @param returnType     the required return type.
      */
     public static void checkMethod(Class cls, String methodName,
                                    Class[] parameterTypes, Class returnType) {
@@ -571,10 +571,10 @@ public final class Lib {
      * with the specified name and signature exists, is public, and returns the
      * specified type.
      *
-     * @param    cls    the class containing the static method.
-     * @param    methodName    the name of the static method.
-     * @param    parameterTypes    the list of parameters.
-     * @param    returnType    the required return type.
+     * @param cls            the class containing the static method.
+     * @param methodName     the name of the static method.
+     * @param parameterTypes the list of parameters.
+     * @param returnType     the required return type.
      */
     public static void checkStaticMethod(Class cls, String methodName,
                                          Class[] parameterTypes,
@@ -594,9 +594,9 @@ public final class Lib {
      * Verifies that the specified class is public, and that a non-static field
      * with the specified name and type exists, is public, and is not final.
      *
-     * @param    cls    the class containing the field.
-     * @param    fieldName    the name of the field.
-     * @param    fieldType    the required type.
+     * @param cls       the class containing the field.
+     * @param fieldName the name of the field.
+     * @param fieldType the required type.
      */
     public static void checkField(Class cls, String fieldName,
                                   Class fieldType) {
@@ -616,9 +616,9 @@ public final class Lib {
      * Verifies that the specified class is public, and that a static field
      * with the specified name and type exists and is public.
      *
-     * @param    cls    the class containing the static field.
-     * @param    fieldName    the name of the static field.
-     * @param    fieldType    the required type.
+     * @param cls       the class containing the static field.
+     * @param fieldName the name of the static field.
+     * @param fieldType the required type.
      */
     public static void checkStaticField(Class cls, String fieldName,
                                         Class fieldType) {

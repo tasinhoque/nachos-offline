@@ -13,8 +13,8 @@ public class StandardConsole implements SerialConsole {
     /**
      * Allocate a new standard console.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
+     * @param privilege encapsulates privileged access to the Nachos
+     *                  machine.
      */
     public StandardConsole(Privilege privilege) {
         System.out.print(" console");
@@ -122,7 +122,7 @@ public class StandardConsole implements SerialConsole {
     /**
      * Write a byte to the object backing this console.
      *
-     * @param    value    the byte to write.
+     * @param value the byte to write.
      */
     protected void out(int value) {
         System.out.write(value);

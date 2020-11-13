@@ -30,11 +30,11 @@ public class NetProcess extends VMProcess {
      * <tr><td>12</td><td><tt>int  accept(int port);</tt></td></tr>
      * </table>
      *
-     * @param    syscall    the syscall number.
-     * @param    a0    the first syscall argument.
-     * @param    a1    the second syscall argument.
-     * @param    a2    the third syscall argument.
-     * @param    a3    the fourth syscall argument.
+     * @param syscall the syscall number.
+     * @param a0      the first syscall argument.
+     * @param a1      the second syscall argument.
+     * @param a2      the third syscall argument.
+     * @param a3      the fourth syscall argument.
      * @return the value to be returned to the user.
      */
     public int handleSyscall(int syscall, int a0, int a1, int a2, int a3) {

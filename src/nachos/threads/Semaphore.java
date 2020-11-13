@@ -25,7 +25,7 @@ public class Semaphore {
     /**
      * Allocate a new semaphore.
      *
-     * @param    initialValue    the initial value of this semaphore.
+     * @param initialValue the initial value of this semaphore.
      */
     public Semaphore(int initialValue) {
         value = initialValue;

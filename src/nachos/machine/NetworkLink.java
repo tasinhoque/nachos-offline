@@ -67,8 +67,8 @@ public class NetworkLink {
      * reliability, between 0 and 1, is the probability that any particular
      * packet will not get dropped by the network.
      *
-     * @param    privilege encapsulates privileged access to the Nachos
-     * machine.
+     * @param privilege encapsulates privileged access to the Nachos
+     *                  machine.
      */
     public NetworkLink(Privilege privilege) {
         System.out.print(" network");
@@ -148,10 +148,10 @@ public class NetworkLink {
      * <tt>send()</tt> is finished being sent. This means that another
      * packet can be sent.
      *
-     * @param    receiveInterruptHandler    the callback to call when a packet
-     * arrives.
-     * @param    sendInterruptHandler    the callback to call when another
-     * packet can be sent.
+     * @param receiveInterruptHandler the callback to call when a packet
+     *                                arrives.
+     * @param sendInterruptHandler    the callback to call when another
+     *                                packet can be sent.
      */
     public void setInterruptHandlers(Runnable receiveInterruptHandler,
                                      Runnable sendInterruptHandler) {
@@ -281,7 +281,7 @@ public class NetworkLink {
      * Send another packet. If a packet is already being sent, the result is
      * not defined.
      *
-     * @param    pkt    the packet to send.
+     * @param pkt the packet to send.
      */
     public void send(Packet pkt) {
         if (outgoingPacket == null)

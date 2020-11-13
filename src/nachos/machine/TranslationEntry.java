@@ -18,12 +18,12 @@ public final class TranslationEntry {
     /**
      * Allocate a new translation entry with the specified initial state.
      *
-     * @param    vpn        the virtual page numben.
-     * @param    ppn        the physical page number.
-     * @param    valid        the valid bit.
-     * @param    readOnly    the read-only bit.
-     * @param    used        the used bit.
-     * @param    dirty        the dirty bit.
+     * @param vpn      the virtual page numben.
+     * @param ppn      the physical page number.
+     * @param valid    the valid bit.
+     * @param readOnly the read-only bit.
+     * @param used     the used bit.
+     * @param dirty    the dirty bit.
      */
     public TranslationEntry(int vpn, int ppn, boolean valid, boolean readOnly,
                             boolean used, boolean dirty) {
@@ -39,7 +39,7 @@ public final class TranslationEntry {
      * Allocate a new translation entry, copying the contents of an existing
      * one.
      *
-     * @param    entry    the translation entry to copy.
+     * @param entry the translation entry to copy.
      */
     public TranslationEntry(TranslationEntry entry) {
         vpn = entry.vpn;
