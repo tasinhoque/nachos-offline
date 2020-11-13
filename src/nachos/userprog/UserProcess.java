@@ -26,7 +26,7 @@ public class UserProcess {
         int size = Machine.processor().getNumPhysPages();
         pageTable = new TranslationEntry[size];
         for (int i = 0; i < size; ++i) {
-            pageTable[i] = new TranslationEntry(i, 0, false, false, false, false);
+            pageTable[i] = new TranslationEntry(i, i, true, false, false, false);
         }
 
         fileDescriptors = new OpenFile[16];
