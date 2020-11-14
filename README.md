@@ -255,6 +255,10 @@
 
   - userProg.UserProcess#allocate()
 
-    1. For `desiredPages` (the parameter denoting the number of physical pages to
-       allocate) times, loop and allocate a physical page.
-    
+    1. For `desiredPages` (the parameter denoting the number of
+       physical pages to allocate) times, loop and allocate a physical
+       page.
+    2. If the allocation is failed, loop and deallocate all physical
+       pages allocated in this loop and return failure.
+    3. If the allocation is successful, increment numPages variable.
+    4. Return success.
