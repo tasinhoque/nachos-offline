@@ -214,3 +214,47 @@
     3. Read from virtual memory into a byte array.
     4. Write the byte array into the file/stream.
     5. Return the size of data written.
+
+### Task 2: Implement support for multiprogramming
+
+- Data Structures Used:
+
+  1. `allocated`: Instance of LinkedList of TranslationEntry.
+
+- Steps: 
+
+  - userprog.UserProcess#readVirtualMemory():
+
+    1. Check if the virtual address parameter `vaddr` is valid.
+    2. Loop through each virtual page within the range computed from the parameters
+       `vaddr` and `length`.  
+    3. If the current virtual page is not valid, break.
+    4. Take the required block of memory from the current page and write it to
+       the array in the parameter called `data`.
+    5. Update the total bytes of memory transferred.
+    6. Outside the loop, finally return the transferred memory count.
+
+  - userprog.UserProcess#writeVirtualMemory():
+
+    1. Check if the virtual address parameter `vaddr` is valid.
+    2. Loop through each virtual page within the range computed from the parameters
+       `vaddr` and `length`.  
+    3. If the current virtual page is not valid, break.
+    4. Mark the required block of memory from the current page where we'll write.
+       Write `data` to that block.
+    5. Update the total bytes of memory transferred.
+    6. Outside the loop, finally return the transferred memory count.
+
+  - userprog.UserProcess#loadSections()
+
+    1. If there is insufficient physical memory, close the coff file and return false.
+    2. Loop through all the sections in the coff file. For each section, loop
+       through all the virtual page numbers. Look up page table using the virtual
+       page number. Using the returned physical page number, load a page into
+       physical memory.
+
+  - userProg.UserProcess#allocate()
+
+    1. For `desiredPages` (the parameter denoting the number of physical pages to
+       allocate) times, loop and allocate a physical page.
+    
