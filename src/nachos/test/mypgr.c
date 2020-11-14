@@ -39,7 +39,7 @@ void main() {
 
   printf("mypr forking echo.coff, halt.coff and joining... \n");
   processID1 = exec("halt.coff", 2, execArgs);
-  int l = join(processID, &status1);
+  int l = join(processID1, &status1);
   // processID2 =exec("echo.coff", 3,  execArgs);
   // int m = join(processID, &status2);
   printf(

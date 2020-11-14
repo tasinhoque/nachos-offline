@@ -17,10 +17,10 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
-        this.waiting = new Lock();
-        this.speak = new Condition2(waiting);
-        this.listen = new Condition2(waiting);
-        this.spoke = false;
+        lock = new Lock();
+        speaker = new Condition2(lock);
+        listener = new Condition2(lock);
+        spoke = false;
     }
 
     /**
@@ -34,17 +34,18 @@ public class Communicator {
      * @param    word    the integer to transfer.
      */
     public void speak(int word) {
-        this.waiting.acquire();
+        lock.acquire();
+
         while (spoke) {
-            this.listen.wakeAll();
-            this.speak.sleep();
+            listener.wakeAll();
+            speaker.sleep();
         }
 
-        this.toTransfer = word;
-        this.spoke = true;
-        this.listen.wakeAll();
-        this.speak.sleep();
-        this.waiting.release();
+        wordToTransfer = word;
+        spoke = true;
+        listener.wakeAll();
+        speaker.sleep();
+        lock.release();
     }
 
     /**
@@ -54,64 +55,66 @@ public class Communicator {
      * @return the integer transferred.
      */
     public int listen() {
-        this.waiting.acquire();
+        lock.acquire();
+
         while (!spoke) {
-            this.listen.sleep();
+            listener.sleep();
         }
-        int transferring = this.toTransfer;
-        this.speak.wakeAll();
+
+        int word = wordToTransfer;
+
+        speaker.wakeAll();
         spoke = false;
-        this.waiting.release();
-        return transferring;
+        lock.release();
+
+        return word;
     }
 
-    private Lock waiting;
-    private Condition2 speak;
-    private Condition2 listen;
-    private int toTransfer;
+    private Lock lock;
+    private Condition2 speaker;
+    private Condition2 listener;
+    private int wordToTransfer;
     private boolean spoke;
 
     public static void selfTest() {
-        KThread t1 = new KThread(new ComTest(1));
-        KThread t2 = new KThread(new ComTest(2));
-        KThread t3 = new KThread(new ComTest(3));
-        KThread t4 = new KThread(new ComTest(4));
-        KThread t5 = new KThread(new ComTest(5));
+        KThread t1 = new KThread(new CommunicatorTest(1));
+        KThread t2 = new KThread(new CommunicatorTest(2));
+        KThread t3 = new KThread(new CommunicatorTest(3));
+        KThread t4 = new KThread(new CommunicatorTest(4));
+        KThread t5 = new KThread(new CommunicatorTest(5));
         t1.fork();
         t2.fork();
         t3.fork();
         t4.fork();
         t5.fork();
 
-        System.out.println("-----Communicator Test---------");
-        new ComTest(0).run();
+        System.out.println("-----Communicator Test Begin---------");
+        new CommunicatorTest(0).run();
     }
 
-    protected static class ComTest implements Runnable {
-        private int comID;
-        private static Communicator comm = new Communicator();
+    protected static class CommunicatorTest implements Runnable {
+        private int communicatorId;
+        private static Communicator communicator = new Communicator();
 
-
-        ComTest(int comID) {
-            this.comID = comID;
+        CommunicatorTest(int comID) {
+            communicatorId = comID;
         }
 
         public void run() {
-
-            if (comID == 0) {
+            if (communicatorId == 0) {
                 for (int i = 0; i < 5; i++) {
-                    System.out.println("ComTest " + comID + " Speak(" + i + ")");
-                    comm.speak(i);
+                    System.out.println("Communicator " + communicatorId + " spoke word " + i);
+                    communicator.speak(i);
                 }
             } else {
                 for (int i = 0; i < 5; i++) {
-                    System.out.println("ComTest " + comID + " listening to... " + i);
-                    int transfered = comm.listen();
-                    System.out.println("ComTest " + comID + " heard word " + transfered);
+                    System.out.println("Communicator " + communicatorId + " listening...");
+                    int transferred = communicator.listen();
+                    System.out.println("Communicator " + communicatorId + " heard word " + transferred);
                 }
             }
-            if (comID == 0)
-                System.out.println("-----Communicator Test Complete-------");
+            if (communicatorId == 0)
+                System.out.println("-----Communicator Test End-------");
             ThreadedKernel.alarm.waitUntil(2000);
         }
     }
