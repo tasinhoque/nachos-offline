@@ -220,6 +220,7 @@
 - Data Structures Used:
 
   1. `allocated`: Instance of LinkedList of TranslationEntry.
+  2. `pageTable`: Array of TranslationEntry.
 
 - Steps: 
 
@@ -252,6 +253,13 @@
        through all the virtual page numbers. Look up page table using the virtual
        page number. Using the returned physical page number, load a page into
        physical memory.
+
+  - userprog.UserProcess#lookUpPageTable()
+
+    1. If `pageTable` is null, return null.
+    2. If the virtual page number parameter is a valid index of `pageTable` then
+       return the corresponding entry.
+    3. Else, return null.
 
   - userProg.UserProcess#allocate()
 
