@@ -71,7 +71,7 @@ public class UserProcess {
             return false;
 
         Lib.debug(dbgProcess, "process created, pid = " + pID);
-        //
+
         thread = (UThread) (new UThread(this).setName(name));
         thread.fork();
 
@@ -97,18 +97,39 @@ public class UserProcess {
         return pID;
     }
 
+    /**
+     * Allocates pages of physical memory.
+     *
+     * @param vpn the virtual page whereafter to allocate the memory
+     * @param desiredPages the amount of physical pages to allocate
+     */
     protected boolean allocate(int vpn, int desiredPages, boolean readOnly) {
-        //    	System.out.println("hehe");
+
+        /*
+         * Tracks the allocated pages.
+         * We allocate one page at a time and add it to this LinkedList.
+         * If we encounter any error, we can revert to previous state
+         * using this LinkedList and return failure.
+         */
         LinkedList<TranslationEntry> allocated = new LinkedList<TranslationEntry>();
 
         for (int i = 0; i < desiredPages; ++i) {
+            /*
+             * This check seems like it should outside this foor loop.
+             * But I'm not gonna mess with it since it's already working.
+             */
             if (vpn >= pageTable.length)
                 return false;
 
+            // Allocate a physical page
             int ppn = UserKernel.newPage();
             if (ppn == -1) {
                 Lib.debug(dbgProcess, "\tcannot allocate new page");
 
+                /*
+                 * Encountered error. Need to deallocate all the pages
+                 * we previously allocated in this loop.
+                 */
                 for (TranslationEntry te : allocated) {
                     pageTable[te.vpn] = new TranslationEntry(te.vpn, 0, false, false, false, false);
                     UserKernel.deletePage(te.ppn);
@@ -116,13 +137,25 @@ public class UserProcess {
                 }
 
                 return false;
+
             } else {
                 TranslationEntry a = new TranslationEntry(vpn + i, ppn, true, readOnly, false, false);
+
+                /*
+                 * Keep track of the allocated physical pages.
+                 * We might need to deallocate them.
+                 */
                 allocated.add(a);
+
+                /*
+                 * Update the process's page table
+                 * with the newly allocated physical page.
+                 */
                 pageTable[vpn + i] = a;
                 ++numPages;
             }
         }
+
         return true;
     }
 
@@ -288,7 +321,7 @@ public class UserProcess {
         }
 
         int transferredCounter = 0;
-        int endVAddr = vaddr + length - 1;//
+        int endVAddr = vaddr + length - 1;
         int startVirtualPage = Machine.processor().pageFromAddress(vaddr);
         int endVirtualPage = Machine.processor().pageFromAddress(endVAddr);
         for (int i = startVirtualPage; i <= endVirtualPage; i++) {
@@ -320,7 +353,7 @@ public class UserProcess {
         }
 
         return transferredCounter;
-        //	
+        //
 
     }
 
@@ -371,7 +404,7 @@ public class UserProcess {
         int argsSize = 0;
         for (int i = 0; i < args.length; i++) {
             argv[i] = args[i].getBytes();
-            // 4 bytes for argv[] pointer; then string plus one for null byte
+            // NOTE: 4 bytes for argv[] pointer; then string plus one for null byte
             argsSize += 4 + argv[i].length + 1;
         }
         if (argsSize > pageSize) {
@@ -498,6 +531,13 @@ public class UserProcess {
         return s;
     }
 
+    /**
+     * Halts the Nachos machine.
+     *
+     * Only the root process (the first process, executed by UserKernel.run())
+     * should be allowed to execute this syscall. Any other process should
+     * ignore the syscall and return immediately.
+     */
     private int handleHalt() {
         if (pID != 0) {
             return 0;
@@ -509,6 +549,20 @@ public class UserProcess {
         return 0;
     }
 
+    /**
+     * Terminates the current process immediately.
+     *
+     * Any open file descriptors belonging to the process are closed. Any
+     * children of the process no longer have a parent process.
+     *
+     * status is returned to the parent process as this process's exit status
+     * and can be collected using the join syscall. A process exiting normally
+     * should (but is not required to) set status to 0.
+     *
+     * exit() never returns.
+     *
+     * @param status the exit status of this process
+     */
     private int handleExit(int status) {
         if (parent != null) {
             parent.statusLock.acquire();
@@ -522,65 +576,127 @@ public class UserProcess {
             UserProcess child = children.removeFirst();
             child.parent = null;
         }
-        System.out.println("hehe exit" + pID + status);
 
         if (pID == 0) {
             Kernel.kernel.terminate();
         } else {
             UThread.finish();
         }
+
         return 0;
 
     }
 
-    //
+    /**
+     * Executes the program stored in the specified file, with the specified
+     * arguments, in a new child process.
+     *
+     * The child process has a new unique process ID, and starts with stdin
+     * opened as file descriptor 0, and stdout opened as file descriptor 1.
+     *
+     * file is a null-terminated string that specifies the name of the file
+     * containing the executable. Note that this string must include the
+     * ".coff" extension.
+     *
+     * argc specifies the number of arguments to pass to the child process.
+     * This number must be non-negative.
+     *
+     * argv is an array of pointers to null-terminated strings that represent
+     * the arguments to pass to the child process. argv[0] points to the first
+     * argument, and argv[argc-1] points to the last argument.
+     *
+     * exec() returns the child process's process ID, which can be passed to
+     * join(). On error, returns -1.
+     *
+     * @param nameVAddr the virtual address storing the filename of the binary
+     * @param argsNum the number of arguments
+     * @param argsVAddr the virtual address storing the arguments
+     * @return the procedd id of the child process
+     */
     private int handleExec(int nameVAddr, int argsNum, int argsVAddr) {
         if (nameVAddr < 0 || argsNum < 0 || argsVAddr < 0) {
-            Lib.debug(dbgProcess, "handleExec:Invalid parameter");
+            Lib.debug(dbgProcess, "handleExec: Invalid parameter");
             return -1;
         }
+
         String fileName = readVirtualMemoryString(nameVAddr, 256);
         if (fileName == null) {
-            Lib.debug(dbgProcess, "handleExec:Read filename failed");
+            Lib.debug(dbgProcess, "handleExec: Read filename failed");
             return -1;
         }
+
         if (!fileName.contains(".coff")) {
-            Lib.debug(dbgProcess, "handleExec:Filename should end with .coff");
+            Lib.debug(dbgProcess, "handleExec: Filename should end with .coff");
             return -1;
         }
+
+        // read the arguments from virtual memory
         String[] args = new String[argsNum];
         for (int i = 0; i < argsNum; i++) {
             byte[] buffer = new byte[4];
             int readLength;
             readLength = readVirtualMemory(argsVAddr + i * 4, buffer);
+
+            // This check isn't necessary.
+            // readVirtualMemoryString() checks it anyway.
             if (readLength != 4) {
-                Lib.debug(dbgProcess, "handleExec:Read argument address falied");
+                Lib.debug(dbgProcess, "handleExec: Read argument address failed");
                 return -1;
             }
+
             int argVAddr = Lib.bytesToInt(buffer, 0);
             String arg = readVirtualMemoryString(argVAddr, 256);
+
             if (arg == null) {
-                Lib.debug(dbgProcess, "handleExec:Read argument failed");
+                Lib.debug(dbgProcess, "handleExec: Read argument failed");
                 return -1;
             }
+
             args[i] = arg;
         }
+
         UserProcess child = UserProcess.newUserProcess();
         boolean isSuccessful = child.execute(fileName, args);
+
         if (!isSuccessful) {
-            Lib.debug(dbgProcess, "handleExec:Execute child process failed");
+            Lib.debug(dbgProcess, "handleExec: Execute child process failed");
             return -1;
         }
+
         child.parent = this;
         this.children.add(child);
         int id = child.pID;
+
         return id;
     }
 
+    /**
+     * Suspends execution of the current process until the child process
+     * specified by the processID argument has exited.
+     *
+     * If the child has already exited by the time of the call, returns
+     * immediately. When the current process resumes, it disowns the child
+     * process, so that join() cannot be used on that process again.
+     *
+     * processID is the process ID of the child process, returned by exec().
+     *
+     * status points to an integer where the exit status of the child process
+     * will be stored. This is the value the child passed to exit(). If the
+     * child exited because of an unhandled exception, the value stored is not
+     * defined.
+     *
+     * If the child exited normally, returns 1. If the child exited as a result
+     * of an unhandled exception, returns 0. If processID does not refer to a
+     * child process of the current process, returns -1.
+     *
+     * @param pID process id
+     * @param statusVAddr the address to store child's exit status at
+     */
     private int handleJoin(int pID, int statusVAddr) {
         if (pID < 0 || statusVAddr < 0) {
             return -1;
         }
+
         UserProcess child = null;
         int childrenNum = children.size();
         for (int i = 0; i < childrenNum; i++) {
@@ -590,103 +706,182 @@ public class UserProcess {
             }
         }
 
+        // a process can only call join() on its childs
         if (child == null) {
-            Lib.debug(dbgProcess, "handleJoin:pID is not the child");
+            Lib.debug(dbgProcess, "handleJoin: pID is not the child");
             return -1;
         }
-        //System.out.println("debug information"+child.pID);
+
         child.thread.join();
 
         child.parent = null;
         children.remove(child);
+
         statusLock.acquire();
         Integer status = childrenExitStatus.get(child.pID);
         statusLock.release();
+
         if (status == null) {
-            Lib.debug(dbgProcess, "handleJoin:Cannot find the exit status of the child");
+            Lib.debug(dbgProcess, "handleJoin: Cannot find the exit status of the child");
             return 0;
         } else {
             //status int 32bits
             byte[] buffer = new byte[4];
             buffer = Lib.bytesFromInt(status);
             int count = writeVirtualMemory(statusVAddr, buffer);
+
             if (count == 4) {
                 return 1;
             } else {
-                Lib.debug(dbgProcess, "handleJoin:Write status failed");
+                Lib.debug(dbgProcess, "handleJoin: Could not load the exit status of the child");
                 return 0;
             }
         }
     }
 
+    /**
+     * Attempt to read up to size bytes into buffer from the file or stream
+     * referred to by descriptor.
+     *
+     * On success, the number of bytes read is returned. If the file descriptor
+     * refers to a file on disk, the file position is advanced by this number.
+     *
+     * It is not necessarily an error if this number is smaller than the number
+     * of bytes requested. If the file descriptor refers to a file on disk,
+     * this indicates that the end of the file has been reached. If the file
+     * descriptor refers to a stream, this indicates that the fewer bytes are
+     * actually available right now than were requested, but more bytes may
+     * become available in the future. Note that read() never waits for a
+     * stream to have more data; it always returns as much as possible
+     * immediately.
+     *
+     * On error, -1 is returned, and the new file position is undefined. This
+     * can happen if fileDescriptor is invalid, if part of the buffer is
+     * read-only or invalid, or if a network stream has been terminated by the
+     * remote host and no more data is available.
+     *
+     * @param descriptor the file descriptor of the file/stream to read from
+     * @param bufferVAddr the virtual address of the buffer
+     * @param size the amount of data to read
+     * @return the number of bytes read successfully
+     */
     private int handleRead(int descriptor, int bufferVAddr, int size) {
         if (bufferVAddr < 0) {
-            Lib.debug(dbgProcess, "handleRead: Buffer Virtual Address out of range");
+            Lib.debug(dbgProcess, "handleRead: Buffer virtual address out of range");
             return -1;
         }
+
         if (descriptor < 0 || descriptor > 15) {
-            Lib.debug(dbgProcess, "handleRead:Descriptor out of range");
+            Lib.debug(dbgProcess, "handleRead: Descriptor out of range");
             return -1;
         }
+
         if (size < 0) {
-            Lib.debug(dbgProcess, "handleRead:Size to read cannot be negative");
+            Lib.debug(dbgProcess, "handleRead: Size to read cannot be negative");
             return -1;
         }
+
         OpenFile file;
         if (descriptors[descriptor] == null) {
-            Lib.debug(dbgProcess, "handleRead:File doesn't exist in the descriptor table");
+            Lib.debug(dbgProcess, "handleRead: File doesn't exist in the descriptor table");
             return -1;
         } else {
             file = descriptors[descriptor];
         }
+
+        // read from the file
         int length = 0;
         byte[] reader = new byte[size];
         length = file.read(reader, 0, size);
+
         if (length == -1) {
-            Lib.debug(dbgProcess, "handleRead:Error occurred when try to read file");
+            Lib.debug(dbgProcess, "handleRead: Error occurred when try to read file");
             return -1;
         }
+
+        // write to the buffer
         int count = 0;
         count = writeVirtualMemory(bufferVAddr, reader, 0, length);
-        return count;
 
+        return count;
     }
 
+    /**
+     * Attempts to write up to size bytes from buffer to the file or stream
+     * referred to by descriptor.
+     *
+     * write() can return before the bytes are actually flushed to the file or
+     * stream. A write to a stream can block, however, if kernel queues are
+     * temporarily full.
+     *
+     * On success, the number of bytes written is returned (zero indicates
+     * nothing was written), and the file position is advanced by this number.
+     * It IS an error if this number is smaller than the number of bytes
+     * requested. For disk files, this indicates that the disk is full. For
+     * streams, this indicates the stream was terminated by the remote host
+     * before all the data was transferred.
+     *
+     * On error, -1 is returned, and the new file position is undefined. This
+     * can happen if fileDescriptor is invalid, if part of the buffer is
+     * invalid, or if a network stream has already been terminated by the
+     * remote host.
+     *
+     * @param descriptor the file descriptor of the file/stream to write to
+     * @param bufferVAddr the virtual address of the buffer
+     * @param size the amount of data to write
+     * @return the number of bytes written successfully
+     */
     private int handleWrite(int descriptor, int bufferVAddr, int size) {
         if (bufferVAddr < 0) {
             Lib.debug(dbgProcess, "handleWrite: Buffer Virtual Address out of range");
             return -1;
         }
+
         if (descriptor < 0 || descriptor > 15) {
-            Lib.debug(dbgProcess, "hanleWirte:Descriptor out of range");
+            Lib.debug(dbgProcess, "hanleWirte: Descriptor out of range");
             return -1;
         }
+
         if (size < 0) {
-            Lib.debug(dbgProcess, "handleWrite:Size to write cannot be negative");
+            Lib.debug(dbgProcess, "handleWrite: Size to write cannot be negative");
             return -1;
         }
+
         OpenFile file;
         if (descriptors[descriptor] == null) {
-            Lib.debug(dbgProcess, "handleWrite:File doesn't exist in the descriptor table");
+            Lib.debug(dbgProcess, "handleWrite: File doesn't exist in the descriptor table");
             return -1;
         } else {
             file = descriptors[descriptor];
         }
+
+        // read from the virtual memory
         int length = 0;
         byte[] writer = new byte[size];
         length = readVirtualMemory(bufferVAddr, writer, 0, size);
+
+        // write to the file
         int count = 0;
         count = file.write(writer, 0, length);
-        //System.out.println(size==count);
+
         if (count == -1) {
-            Lib.debug(dbgProcess, "handleWrite:Error occur when read file");
+            Lib.debug(dbgProcess, "handleWrite: Error occur when read file");
             return -1;
         }
+
         return count;
     }
 
-    protected static final int syscallHalt = 0, syscallExit = 1, syscallExec = 2, syscallJoin = 3, syscallCreate = 4,
-        syscallOpen = 5, syscallRead = 6, syscallWrite = 7, syscallClose = 8, syscallUnlink = 9;
+    protected static final int  syscallHalt   = 0;
+    protected static final int  syscallExit   = 1;
+    protected static final int  syscallExec   = 2;
+    protected static final int  syscallJoin   = 3;
+    protected static final int  syscallCreate = 4;
+    protected static final int  syscallOpen   = 5;
+    protected static final int  syscallRead   = 6;
+    protected static final int  syscallWrite  = 7;
+    protected static final int  syscallClose  = 8;
+    protected static final int  syscallUnlink = 9;
 
     /**
      * Handle a syscall exception. Called by <tt>handleException()</tt>. The

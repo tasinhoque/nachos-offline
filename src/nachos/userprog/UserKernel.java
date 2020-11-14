@@ -41,6 +41,10 @@ public class UserKernel extends ThreadedKernel {
         pageLock = new Lock();
 
         int numPhysPages = Machine.processor().getNumPhysPages();
+
+        /*
+         * Initialize the memory full of available pages
+         */
         availablePages = new LinkedList<Integer>();
         for (int i = 0; i < numPhysPages; ++i)
             availablePages.add(new Integer(i));
@@ -136,6 +140,11 @@ public class UserKernel extends ThreadedKernel {
         return Machine.processor().makeAddress(pn, offset);
     }
 
+    /**
+     * Takes a page from the available pages.
+     *
+     * @return the address of the physical page.
+     */
     public static int newPage() {
         int ret = -1;
 
@@ -147,6 +156,9 @@ public class UserKernel extends ThreadedKernel {
         return ret;
     }
 
+    /**
+     * Gives a page back to the free physical memory.
+     */
     public static boolean deletePage(int ppn) {
         boolean ret = false;
 
@@ -171,5 +183,9 @@ public class UserKernel extends ThreadedKernel {
     private static int offsetLen, offsetMask;
 
     private static Lock pageLock;
+
+    /**
+     * Tracks the available pages in virtual memory
+     */
     private static LinkedList<Integer> availablePages;
 }
