@@ -34,6 +34,7 @@
 - Steps:
 
   - threads.KThread#join():
+
     1. If `this` thread is already finished, return immediately.
     2. Record the state of the machine interrupt and disable it.
     3. If `joinQueue` (of `this` thread) is null, initialize it.
@@ -43,6 +44,7 @@
     6. Restore machine interrupt to the previous state.
 
   - threads.KThread#finish():
+
     1. Record the state of the machine interrupt and disable it.
     2. Move all the threads that were waiting on current thread to
        ready state.
@@ -55,36 +57,45 @@
 
 ### Task 2: Implement condition variables directly
 
+- Data Structures Used:
+
+  1. `waitQueue`: A LinkedList instance of KThread (used as a FIFO queue)
+  2. `conditionLock`: An instance of Lock class.
+
 - Steps:
-  - Sleep
+
+  - threads.Condition2#Condition2():
+
+    1. Initialize `waitQueue`.
+
+  - threads.Condition2#sleep():
+
     1. Disable machine interrupt.
     2. Release `conditionLock`.
     3. Add the current KThread to the `waitQueue`
     4. Relinquish the CPU for the current thread.
     5. Acquire `conditionLock`.
     6. Restore machine interrupt.
-  - Wake
+
+  - threads.Condition2#wake():
+
     1. Disable machine interrupt.
     2. If the `waitQueue` is not empty, remove the first thread from the front and
-    change its state to ready, along with putting it in the `readyQueue` (a static
-    `ThreadQueue` in `KThread`).
+       change its state to ready, along with putting it in the `readyQueue` (a static
+       `ThreadQueue` in `KThread`).
     3. Restore machine interrupt.
-  - Wake All
+
+  - threads.Condition2#wakeAll():
+
     1. Disable machine interrupt.
     2. While the `waitQueue` is not empty, remove the first thread from the front and
-    change its state to ready, along with putting it in the `readyQueue` (a static
-    `ThreadQueue` in `KThread`).
+       change its state to ready, along with putting it in the `readyQueue` (a static
+       `ThreadQueue` in `KThread`).
     3. Restore machine interrupt.
-- Changes:
-  1. Condition2() constructor
-  2. sleep()
-  3. wake()
-  4. wakeAll()
-- Data Structures Used:
-  1. `waitQueue`: Linked list of KThread (used as a FIFO queue)
-  2. `conditionLock`: An instance of Lock class.
-- Testing: We forked three threads after creating them.
 
+- Testing: We created three threads. Each of them printed a line and went to sleep.
+  We then woke a single thread and created another three threads. After that, we 
+  woke up all the remaining threads. 
 
 ### Task 3: Complete the implementation of the Alarm class
 
@@ -120,3 +131,49 @@
     5. Restore machine interrupt to the previous state.
 
 - Testing: We created 10 threads and called Alarm#waitUntil() on them.
+
+### Task 4: Implement synchronous send and receive of one-word messages 
+
+- Data Structures Used:
+
+  1. `lock`: An instance of Lock.
+  2. `speaker`: An instance of Condition2.
+  3. `listener`: An instance of Condition2.
+  4. `wordToTransfer`: An integer denoting the word we are communicating.
+  5. `spoke`: A boolean to keep track of whether any speaker has spoke (without
+      begin listened to).
+  6. `CommunicatorTest`: A java class used for testing. It contains a static 
+     instance of `Communicator` and an integer `communicatorId`.
+    
+
+- Steps:
+
+  - threads.Communicator#Communicator():
+
+    1. Initialize `lock`.
+    2. Initialize `listener` & `speaker` with `lock`.
+    3. Initialize `spoke` with false.
+
+  - threads.Communicator#speak(`word`):
+    1. Acquire `lock`.
+    2. While someone has spoke some word which is still not heard by any listener,
+       wake up all the listeners and put the speaker to sleep.
+    3. Set `wordToTransfer` to the parameter `word`. 
+    4. Set `spoke` to true.
+    5. Wake up all listeners.
+    6. Put this speaker to sleep.
+    7. Release `lock`.
+
+  - threads.Communicator#listen():
+    1. Acquire `lock`.
+    2. While there is no incoming word, put this listener to sleep.
+    3. Store the incoming word `wordToTransfer`.
+    4. Wake up all the speakers.
+    5. Set `spoke` to false.
+    6. Release `lock`.
+    7. Return the word.
+
+- Testing: We created five instances of `CommunicatorTest` for the purpose of 
+  listening. Then, we created another instance of the same class as a speaker and 
+  executed its speak method for five times. Only one listener could listen to any 
+  specific word transferred from the speaker.
