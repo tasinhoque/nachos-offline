@@ -120,3 +120,41 @@
     5. Restore machine interrupt to the previous state.
 
 - Testing: We created 10 threads and called Alarm#waitUntil() on them.
+
+
+## Part 2
+
+### Task 1: Implement the system calls read and write documented in syscall.h
+
+- Data Structures Used:
+
+  1. `machine.OpenFile` for handling files and streams.
+
+- Steps:
+
+  - userprog.UserProcess#handleSyscall():
+
+    1. For syscallRead, call userprog.UserProcess#handleRead() with
+       the first three arguments.
+    2. For syscallWrite, call userprog.UserProcess#handleWrite() with
+       the first three arguments.
+
+  - userprog.UserProcess#handleRead():
+
+    1. Check for validity of arguments passed. If invalid, return
+       failure.
+    2. Open the file/stream indicated by the file descriptor passed in
+       the args.
+    3. Read from the opened file/stream into a byte array.
+    4. Write the byte array into virtual memory.
+    5. Return the size of data read.
+
+  - userprog.UserProcess#handleWrite():
+
+    1. Check for validity of arguments passed. If invalid, return
+       failure.
+    2. Open the file/stream indicated by the file descriptor passed in
+       the args.
+    3. Read from virtual memory into a byte array.
+    4. Write the byte array into the file/stream.
+    5. Return the size of data written.
