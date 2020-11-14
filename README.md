@@ -262,7 +262,7 @@
        return the corresponding entry.
     3. Else, return null.
 
-    - userProg.UserProcess#allocate()
+  - userProg.UserProcess#allocate()
 
     1. For `desiredPages` (the parameter denoting the number of
        physical pages to allocate) times, loop and allocate a physical
