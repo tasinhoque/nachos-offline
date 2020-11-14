@@ -1,24 +1,3 @@
-# Report Template
-
-## Part #num
-
-### Task #num: Heading (copy from the assignment pdf)
-
-- Data Structures Used:
-
-  1. `variableRef`: What it is. What it does.
-
-- Steps:
-
-  - package.class#method():
-
-    1. Pseudocode step 1.
-    2. Pseudocode step 2.
-
-- Testing:
-
-- Additional Comment: (if any)
-
 # Report
 
 ## Part 1
@@ -261,7 +240,7 @@
        return the corresponding entry.
     3. Else, return null.
 
-  - userProg.UserProcess#allocate()
+    - userProg.UserProcess#allocate()
 
     1. For `desiredPages` (the parameter denoting the number of
        physical pages to allocate) times, loop and allocate a physical
@@ -270,3 +249,54 @@
        pages allocated in this loop and return failure.
     3. If the allocation is successful, increment numPages variable.
     4. Return success.
+    
+### Task 3:  Implement the system calls (exec, join, and exit, also documented in syscall.h).
+
+- Data structures Used:
+	1.	`ChildrenExitStatus`: A HashMap where every child's exit status is saved.
+	2.	`StatusLock`: A lock variable.
+	3.	`children`: A linkList of user processes.
+	4.  `childProcessStatus`: A hashmap for ever process for its children status.
+	
+
+- userprog.UserProcess#handleExec():
+
+	We passed three parameters here. 
+    - the Memory address of the file
+    - number of argument
+    - the memory address for fetching the arguments
+
+	1. For handling the execution, first it gets the filename from virtualMemory
+		that is to be executed.
+	2. Next, fetches all the arguments from the virtualMemory.
+	3. Create a new UserProcess thread .
+	4. Execute the newly created UserProcess thread by passing the filename and arguments.
+	5. Make the current thread as the parent thread of this newly created thread
+ 		and add this new thread to be the children list.
+	6.	Return the id of the newly created thread.
+
+- userprog.UserProcess#handleJoin():
+	
+	handleJoin() receives two parameters. 
+  - the process for  joining 
+  - the memory address where it's exitStatus will be saved
+
+	1. Current process  searches through it's children table for the process passed as argument
+	2. If the child is found, the join  function is called upon from thread
+	3. After that, we remove the child from its parent's children list
+	4. We fetch Child's ExitStatus from  the ChildrenExitStatus 
+	5. We write the child's ExitStatus to the  virtual memory address that was passed as function
+		argument
+		
+	
+- userprog.UserProcess#handleExit():
+	
+	handleExit() function receives a parameter of exitStatus of the  process that is to be 
+	passed to its parent process.
+
+	1. If the parent process is not null, we put the status of this thread in the 
+		childProcessStatus hashmap of its parent.
+	2. Release any resource allotted by loadSection.
+	3. Remove it's child processes and set their parent to be null
+	4. If the process is root, we terminate it by terminating kernel
+		else  we finish the thread and return. 
